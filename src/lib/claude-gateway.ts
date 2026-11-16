@@ -1,14 +1,7 @@
-// Shared Claude call through Lovable AI, used by the demo page's address and the MCP tool.
+// Shared Claude call straight to the Anthropic API (ANTHROPIC_API_KEY), used by the demo page's address and the MCP tool.
 export const DEMO_MODELS = ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"] as const;
 export type DemoModel = (typeof DEMO_MODELS)[number];
 export const MAX_PROMPT_CHARS = 20000;
-
-// The demo's model names mapped to the closest Claude models served by Lovable AI.
-const MODEL_MAP: Record<DemoModel, string> = {
-  "claude-haiku-5-5": "anthropic/claude-haiku-4-5",
-  "claude-sonnet-5-5": "anthropic/claude-sonnet-5",
-  "claude-opus-5-5": "anthropic/claude-opus-5-5",
-};
 
 export class ClaudeError extends Error {
   constructor(message: string, public status: number) {
@@ -17,17 +10,17 @@ export class ClaudeError extends Error {
 }
 
 export async function askClaude(prompt: string, model: DemoModel, signal?: AbortSignal) {
-  const key = process.env["LOVABLE_API_KEY"];
-  if (!key) throw new ClaudeError("AI is not configured", 500);
-  const r = await fetch("https://ai.gateway.lovable.dev/v1/messages", {
+  const key = process.env["ANTHROPIC_API_KEY"];
+  if (!key) throw new ClaudeError("Missing ANTHROPIC_API_KEY", 500);
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
     method: "POST",
     signal: signal ?? null,
-    headers: { Authorization: `Bearer ${key}`, "X-Lovable-AIG-SDK": "fetch", "content-type": "application/json" },
-    body: JSON.stringify({ model: MODEL_MAP[model], max_tokens: 2500, stream: true, messages: [{ role: "user", content: prompt }] }),
+    headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({ model, max_tokens: 2500, stream: true, messages: [{ role: "user", content: prompt }] }),
   });
   if (!r.ok || !r.body) {
     const err = await r.json().catch(() => null);
-    const status = [402, 403, 429].includes(r.status) ? r.status : 502;
+    const status = [400, 401, 403, 429].includes(r.status) ? r.status : 502;
     throw new ClaudeError(err?.error?.message || err?.message || "AI request failed", status);
   }
   // Read the stream server-side and return the full answer.
