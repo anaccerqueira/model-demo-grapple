@@ -103,7 +103,7 @@ function Login() {
         <h1 className="text-xl font-semibold">
           {mode === "signup" ? "Create an account" : mode === "forgot" ? "Reset your password" : "Sign in"}
         </h1>
-        <p className="mt-1 text-sm text-muted-foreground">AI Demo Gateway</p>
+        <p className="mt-1 text-sm text-muted-foreground">AI Demo</p>
         <form onSubmit={submit} className="mt-6 grid gap-3">
           <div className="grid gap-1.5">
             <Label htmlFor="email">Email</Label>
