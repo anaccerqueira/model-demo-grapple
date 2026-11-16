@@ -558,7 +558,7 @@ function hideAll(){ CARDS.forEach(i=>$(i).classList.add("hidden")); }
 
 /* ---------------- model calls ---------------- */
 /* Lovable version: models are called through a Supabase Edge Function named "llm". Fill these two values. */
-const SUPABASE_URL = "https://c--00c05026-8f4d-4f26-99a1-d569c30e5afa-prod.lovable.cloud";
+const SUPABASE_URL = "";
 const SUPABASE_ANON_KEY = "sb_publishable_yJ4TXcT9_es0oY2whrmR4A_0Zh4vqYH";
 const sample = async (prompt, opts={}) => {
   const res = await fetch(`${SUPABASE_URL}/functions/v1/llm`, {

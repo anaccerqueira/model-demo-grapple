@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as FunctionsV1LlmRouteImport } from './routes/functions/v1/llm'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FunctionsV1LlmRoute = FunctionsV1LlmRouteImport.update({
+  id: '/functions/v1/llm',
+  path: '/functions/v1/llm',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/functions/v1/llm': typeof FunctionsV1LlmRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/functions/v1/llm': typeof FunctionsV1LlmRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/functions/v1/llm': typeof FunctionsV1LlmRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/functions/v1/llm'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/functions/v1/llm'
+  id: '__root__' | '/' | '/functions/v1/llm'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  FunctionsV1LlmRoute: typeof FunctionsV1LlmRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/functions/v1/llm': {
+      id: '/functions/v1/llm'
+      path: '/functions/v1/llm'
+      fullPath: '/functions/v1/llm'
+      preLoaderRoute: typeof FunctionsV1LlmRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  FunctionsV1LlmRoute: FunctionsV1LlmRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
