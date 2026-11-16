@@ -1,0 +1,2 @@
+- [x] Fix cut-off AI answers in demo
+- [x] Create default login grapple.test@gmail.com

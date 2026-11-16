@@ -16,7 +16,7 @@ export async function askClaude(prompt: string, model: DemoModel, signal?: Abort
     method: "POST",
     signal: signal ?? null,
     headers: { "x-api-key": key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model, max_tokens: 2500, stream: true, messages: [{ role: "user", content: prompt }] }),
+    body: JSON.stringify({ model, max_tokens: 16000, stream: true, messages: [{ role: "user", content: prompt }] }),
   });
   if (!r.ok || !r.body) {
     const err = await r.json().catch(() => null);
