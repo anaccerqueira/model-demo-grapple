@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Grapple BR · AI case workflow demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#f6f4ef;--card:#fff;--ink:#16181d;--muted:#5d6370;--line:#e4e0d6;
+  --brand:#1f3b2d;--brand2:#2f6b4f;--accent:#c8a24a;
+  --ok:#1f7a4d;--okbg:#e6f4ec;--warn:#9a6b00;--warnbg:#fbf1d9;--bad:#a8322d;--badbg:#f8e3e1;
+  --mono:ui-monospace,SFMono-Regular,Menlo,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 Inter,system-ui,sans-serif}
+a{color:var(--brand2)}
+header{background:var(--brand);color:#fff;padding:28px 20px 0}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header .wrap{padding:0}
+.eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#cfe3d6}
+h1{font-family:Fraunces,serif;font-weight:700;font-size:32px;line-height:1.15;margin:6px 0 8px}
+header p{margin:0 0 18px;color:#dfece3;max-width:760px}
+nav{display:flex;gap:4px;flex-wrap:wrap}
+nav button{background:transparent;border:0;color:#cfe3d6;font:600 14px Inter;padding:12px 16px;border-radius:10px 10px 0 0;cursor:pointer}
+nav button.on{background:var(--bg);color:var(--brand)}
+main{padding:24px 0 60px}
+section.view{display:none}section.view.on{display:block}
+h2{font-family:Fraunces,serif;font-size:22px;margin:0 0 4px}
+h3{font-size:15px;margin:0 0 8px}
+.sub{color:var(--muted);margin:0 0 16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:16px}
+.steps{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 18px}
+.step{display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--muted)}
+.step b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--line);color:var(--ink);font-size:11px}
+.step.active{border-color:var(--brand2);color:var(--brand)}.step.active b{background:var(--brand2);color:#fff}
+.step.done b{background:var(--ok);color:#fff}
+.cases{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin-bottom:12px}
+.case{text-align:left;background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;cursor:pointer;font:inherit}
+.case.on{border-color:var(--brand2);box-shadow:0 0 0 2px #2f6b4f22}
+.case .t{font-weight:600;font-size:14px}.case .g{font-size:12px;color:var(--muted)}
+textarea{width:100%;min-height:110px;border:1px solid var(--line);border-radius:10px;padding:12px;font:inherit;resize:vertical;background:#fdfcf9}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:11px 18px;font:600 14px Inter;cursor:pointer}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.ghost{background:#fff;color:var(--brand);border:1px solid var(--line)}
+.note{font-size:12.5px;color:var(--muted)}
+.pill{display:inline-block;font-size:11.5px;font-weight:600;padding:2px 8px;border-radius:999px;background:#eef1ee;color:var(--brand)}
+.pill.ok{background:var(--okbg);color:var(--ok)}.pill.warn{background:var(--warnbg);color:var(--warn)}.pill.bad{background:var(--badbg);color:var(--bad)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:780px){.grid2{grid-template-columns:1fr}h1{font-size:26px}}
+.src{border-left:3px solid var(--accent);padding:8px 12px;margin:8px 0;background:#fffdf6;border-radius:0 8px 8px 0}
+.src .h{display:flex;justify-content:space-between;gap:8px;font-size:13px}
+.src .x{font-size:13px;color:#333;margin-top:4px}
+.bar{height:6px;background:#eee;border-radius:4px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--accent)}
+.model h3{display:flex;justify-content:space-between;align-items:center}
+.stream{font-family:var(--mono);font-size:12px;color:var(--muted);background:#f8f7f3;border-radius:8px;padding:8px;max-height:90px;overflow:hidden;white-space:pre-wrap}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.score{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
+.kpi{flex:1;min-width:120px;background:#f8f7f3;border-radius:10px;padding:10px}
+.kpi .v{font:700 24px Fraunces,serif}.kpi .l{font-size:12px;color:var(--muted)}
+.gate{border-radius:12px;padding:14px 16px;font-weight:600}
+.gate.ok{background:var(--okbg);color:var(--ok)}.gate.warn{background:var(--warnbg);color:var(--warn)}.gate.bad{background:var(--badbg);color:var(--bad)}
+.letter{white-space:pre-wrap;font-family:Georgia,serif;font-size:14.5px;background:#fffefb;border:1px solid var(--line);border-radius:10px;padding:16px;max-height:420px;overflow:auto}
+.email{border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.email .hd{background:#f3f1ea;padding:10px 14px;font-size:13px;border-bottom:1px solid var(--line)}
+.email .bd{padding:14px;white-space:pre-wrap;font-family:Georgia,serif;font-size:14px;max-height:300px;overflow:auto}
+.banner{background:var(--warnbg);color:#6b4b00;border:1px solid #efd99a;border-radius:10px;padding:10px 14px;font-size:13.5px;margin-bottom:16px}
+.funnel .lvl{display:grid;grid-template-columns:200px 1fr 70px;gap:10px;align-items:center;margin:6px 0;font-size:13.5px}
+.funnel .lvl .b{height:26px;border-radius:6px;background:var(--brand2);opacity:.85}
+.funnel .drop{font-size:12px;color:var(--bad);margin:-2px 0 6px 210px}
+.cols3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:780px){.cols3{grid-template-columns:1fr}.funnel .lvl{grid-template-columns:120px 1fr 54px}.funnel .drop{margin-left:130px}}
+ul.tight{margin:6px 0;padding-left:18px}ul.tight li{margin:3px 0}
+.arch{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:13px}
+.arch span{background:#fff;border:1px solid var(--line);border-radius:8px;padding:6px 10px}
+.arch em{color:var(--muted);font-style:normal}
+.hidden{display:none!important}
+.err{color:var(--bad);font-size:13px}
+details summary{cursor:pointer;font-weight:600;font-size:13.5px}
+code{font-family:var(--mono);font-size:12.5px;background:#f1efe8;padding:1px 5px;border-radius:4px}
+
+.pbs{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:8px;margin-top:10px}
+.pb{background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13.5px}
+.cta{border:2px solid var(--brand2)}
+.donehead{border-radius:12px;padding:16px 18px;margin-bottom:6px}
+.donehead.ok{background:var(--okbg)}.donehead.warn{background:var(--warnbg)}.donehead.bad{background:var(--badbg)}
+.eyebrow2{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.ctarow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.btn.big{padding:14px 22px;font-size:15px}
+.tl{border-left:2px solid var(--line);margin:8px 0 0 6px;padding-left:16px}
+.tli{position:relative;margin:0 0 12px;font-size:13.5px}
+.tli:before{content:"";position:absolute;left:-23px;top:4px;width:12px;height:12px;border-radius:50%;background:var(--line)}
+.tli.on:before{background:var(--ok)}
+.tli span{font-weight:600;display:block}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="eyebrow">Product sample · built by Ana Cerqueira</div>
+    <h1>Grapple, localised for Brazil: an end to end AI case workflow</h1>
+    <p>Real retrieval over Brazilian labour law, two models drafting in parallel, a third model judging blind, a citation score, a quality gate that can refuse to send, and the funnel I would run the product on.</p>
+    <nav id="nav">
+      <button data-v="workflow" class="on">1 · Live workflow</button>
+      <button data-v="funnel">2 · Product metrics</button>
+      <button data-v="brazil">3 · Brazil expansion</button>
+      <button data-v="market">4 · Market benchmark</button>
+      <button data-v="how">5 · How it works</button>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+<!-- ============ WORKFLOW ============ -->
+<section class="view on" id="v-workflow">
+  <div id="noModels" class="banner hidden">Model calls are not configured yet.</div>
+
+  <div class="card" style="background:#fbfaf6">
+    <h3>Scope: one niche, done well</h3>
+    <p style="margin:0">This pilot only handles <b>end of employment disputes</b> in Brazil. Every story is routed to one of four lawyer style playbooks. Anything else is politely turned away instead of guessed at.</p>
+    <div class="pbs" id="pbList"></div>
+  </div>
+
+  <div class="steps" id="steps">
+    <div class="step active" data-s="1"><b>1</b>Story</div>
+    <div class="step" data-s="2"><b>2</b>Triage</div>
+    <div class="step" data-s="3"><b>3</b>Retrieve</div>
+    <div class="step" data-s="4"><b>4</b>Draft A vs B</div>
+    <div class="step" data-s="5"><b>5</b>Guardrails</div>
+    <div class="step" data-s="6"><b>6</b>Judge</div>
+    <div class="step" data-s="7"><b>7</b>Score + value</div>
+    <div class="step" data-s="8"><b>8</b>Done</div>
+  </div>
+
+  <div class="card">
+    <h2>1. The worker tells their story</h2>
+    <p class="sub">In the real product this is the only thing the user does: describe what happened in their own words. The examples below just fill the box for the demo. You can edit them or write a new story.</p>
+    <div class="cases" id="cases"></div>
+    <label class="note" for="caseText"><b>Worker's story</b> (Portuguese, as a real user would write it)</label>
+    <textarea id="caseText" style="min-height:90px"></textarea>
+    <div class="row" style="margin-top:10px">
+      <button class="btn" id="runBtn">Run the workflow</button>
+      <span class="note" id="runNote">About 30 to 60 seconds. Four real model calls.</span>
+    </div>
+  </div>
+
+  <div class="card hidden" id="triageCard">
+    <h2>2. Triage: route, redact, pre check</h2>
+    <p class="sub">A small, cheap model reads the story once: which playbook it belongs to and the key facts. Then code runs the checks that should never depend on a model.</p>
+    <div id="triageOut"></div>
+  </div>
+
+  <div class="card hidden" id="retrCard">
+    <h2>3. Retrieved sources</h2>
+    <p class="sub">The playbook's mandatory sources always come first, then BM25 keyword retrieval adds related provisions. Only these reach the drafting models.</p>
+    <div id="retrList"></div>
+  </div>
+
+  <div class="card hidden" id="draftCard">
+    <h2>4. Two models fill the playbook</h2>
+    <p class="sub">Same playbook, same sources, different models. The models do not invent the letter's structure: they fill a lawyer approved skeleton with the worker's facts.</p>
+    <div class="grid2"><div class="model" id="mA"></div><div class="model" id="mB"></div></div>
+  </div>
+
+  <div class="card hidden" id="verifyCard">
+    <h2>5. Guardrails, checked by code</h2>
+    <p class="sub">No AI here. Hard failures block sending; soft ones lower the score.</p>
+    <div id="verifyOut"></div>
+  </div>
+
+  <div class="card hidden" id="judgeCard">
+    <h2>6. Model C judges both drafts, blind</h2>
+    <p class="sub">The judge does not know which model wrote which draft, and the order is shuffled to avoid position bias.</p>
+    <div id="judgeOut"></div>
+  </div>
+
+  <div class="card hidden" id="gateCard">
+    <h2>7. Score, gate and claim value</h2>
+    <p class="sub">Overall = 50% citation accuracy + 30% citation strength + 20% letter quality, minus 15 for overreach. Any hard guardrail failure blocks sending.</p>
+    <div id="gateOut"></div>
+    <h3 style="margin-top:18px">Estimated claim value</h3>
+    <p class="note" style="margin-top:0">Facts come from triage; the money is calculated by code with visible formulas. Edit the salary to recalculate.</p>
+    <div id="valueOut"></div>
+    <details style="margin-top:14px"><summary>Time and cost of this run</summary><div id="costOut" style="margin-top:8px"></div></details>
+  </div>
+
+  <div class="card hidden cta" id="doneCard">
+    <div id="doneOut"></div>
+  </div>
+
+  <div class="card" id="logCard">
+    <h3>Runs this session <span class="pill">live data</span></h3>
+    <p class="note">Every run is logged here, so the model comparison in tab 2 is built from real results.</p>
+    <div id="logOut"><p class="note">No runs yet.</p></div>
+  </div>
+</section>
+
+<!-- ============ FUNNEL ============ -->
+<section class="view" id="v-funnel">
+  <h2>The metrics I would run Grapple on</h2>
+  <p class="sub">On a pay on success model, every case that stalls is lost revenue. So the north star is settlements per case started, not letters sent.</p>
+
+  <div class="banner">The funnel below uses <b>illustrative numbers</b> to show the structure of the dashboard. They are not real Grapple or Brazil data. The model comparison further down is live, built from the runs on tab 1.</div>
+
+  <div class="cols3">
+    <div class="card"><div class="l note">North star</div><div style="font:700 28px Fraunces,serif">Settled ÷ started</div><div class="note">Captures intake, quality and negotiation in one number.</div></div>
+    <div class="card"><div class="l note">Guardrail</div><div style="font:700 28px Fraunces,serif">0 hallucinations sent</div><div class="note">Measured by the deterministic check on every outgoing letter.</div></div>
+    <div class="card"><div class="l note">Efficiency</div><div style="font:700 28px Fraunces,serif">Cost per settled case</div><div class="note">Model spend plus human review time, against recovered value.</div></div>
+  </div>
+
+  <div class="card funnel">
+    <h3>Case funnel <span class="pill warn">illustrative</span></h3>
+    <div id="funnel"></div>
+    <p class="note" style="margin-top:10px">Where I would look first: the biggest drop is intake. Bets: show an estimated claim value after 3 questions and ask for documents later; save progress so users can come back; for refused cases, say exactly what evidence would make the case stronger instead of a dead end.</p>
+  </div>
+
+  <div class="card">
+    <h3>Model A vs Model B <span class="pill ok">live from your runs</span></h3>
+    <div id="cmp"><p class="note">Run the workflow on tab 1 to fill this table.</p></div>
+  </div>
+
+  <div class="card">
+    <h3>Weekly scorecard I would review</h3>
+    <table>
+      <tr><th>Metric</th><th>Why it matters</th><th>Source</th></tr>
+      <tr><td>Intake completion rate</td><td>Largest drop in most self serve legal flows</td><td>Product analytics</td></tr>
+      <tr><td>Gate outcome split (send / review / refuse)</td><td>Too many refusals hurts growth, too few hurts trust</td><td>Workflow logs</td></tr>
+      <tr><td>Citation accuracy, per model</td><td>Picks the model and catches regressions after prompt changes</td><td>Step 4 + judge</td></tr>
+      <tr><td>Human review agreement with judge</td><td>Tells us when the judge can be trusted alone</td><td>Weekly lawyer sample</td></tr>
+      <tr><td>Reply rate and time to reply</td><td>Is the letter credible to employers?</td><td>Email events</td></tr>
+      <tr><td>Settlement rate and median value</td><td>Revenue on a success fee model</td><td>Case outcomes</td></tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ BRAZIL ============ -->
+<section class="view" id="v-brazil">
+  <h2>Why Brazil, and what has to change</h2>
+  <p class="sub">The UK model works partly because sending legal letters and advising on rights are not reserved activities. Brazil is different, so the product has to adapt before it can launch.</p>
+
+  <div class="grid2">
+    <div class="card">
+      <h3>The constraint</h3>
+      <p>The OAB statute makes legal consultancy and advice an activity exclusive to lawyers (<a href="https://www.planalto.gov.br/ccivil_03/leis/l8906.htm">Lei 8.906/94, art. 1º, II</a>). A pure "no lawyers" product that advises workers would face regulatory risk.</p>
+    </div>
+    <div class="card">
+      <h3>The opening</h3>
+      <p>In labour courts, workers can file and follow their own claims without a lawyer (<i>jus postulandi</i>, CLT art. 791), at first instance and regional courts (TST Súmula 425). So a tool that helps a worker organise facts, check the law and act in their own name has a real foothold.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Proposed model for a Brazil pilot</h3>
+    <ul class="tight">
+      <li><b>Self serve layer:</b> the worker builds their case, sees the relevant law with verified citations, and sends a notice in their own name.</li>
+      <li><b>Partner lawyer layer:</b> anything that is advice, or any case the gate sends to review, goes to an OAB registered partner lawyer who reviews and signs.</li>
+      <li><b>Business model to validate with counsel:</b> fee structures between a tech company and lawyers have specific ethics rules in Brazil, so this needs legal review before launch.</li>
+      <li><b>Pilot scope:</b> 3 claim types with clear statutory rules (unpaid overtime, late severance, pregnancy dismissal), one state.</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h3>Same workflow, UK version</h3>
+    <p style="margin:0">Nothing in the pipeline is Brazil specific except the corpus and the value formulas. For the UK, swap in the Employment Rights Act provisions (including the 6 month qualifying period from January 2027), Acas early conciliation and tribunal time limits, and keep the verifier, judge, gate and funnel as they are.</p>
+  </div>
+
+  <div class="card">
+    <h3>Roadmap</h3>
+    <table>
+      <tr><th>Now (this demo)</th><th>Next</th><th>Later</th></tr>
+      <tr>
+        <td>RAG over curated statutes, two model drafting, blind judge, citation score, quality gate, funnel</td>
+        <td><b>Negotiation agent:</b> reads the employer reply, proposes a counter offer within bounds the user approved, never accepts on its own.<br><br>Labelled eval set of 200 cases reviewed by lawyers</td>
+        <td>Embedding retrieval with automatic updates when law or case law changes<br><br>Settlement value prediction from outcomes data</td>
+      </tr>
+    </table>
+  </div>
+</section>
+
+<!-- ============ MARKET ============ -->
+<section class="view" id="v-market">
+  <h2>Market benchmark: what could and could not work in Brazil</h2>
+  <p class="sub">Similar products in the UK, US and Brazil, what happened to them, and what that means for a Brazilian launch.</p>
+
+  <div class="cols3">
+    <div class="card"><div class="note">New labour lawsuits in Brazil, 2024</div><div style="font:700 28px Fraunces,serif">3.6 million</div><div class="note">CSJT, Relatório Geral 2024</div></div>
+    <div class="card"><div class="note">Main regulatory risk</div><div style="font:700 22px Fraunces,serif">OAB: advice is for lawyers only</div><div class="note">Lei 8.906/94, art. 1º, II, and active lawsuits against legaltechs</div></div>
+    <div class="card"><div class="note">Main opening</div><div style="font:700 22px Fraunces,serif">Workers can file alone</div><div class="note">CLT art. 791, first instance and regional courts</div></div>
+  </div>
+
+  <div class="card">
+    <h3>Benchmark</h3>
+    <table>
+      <tr><th>Player</th><th>Model</th><th>What happened</th><th>Lesson for Grapple BR</th></tr>
+      <tr><td><b>Grapple</b><div class="note">UK</div></td><td>AI only, no lawyers, success fee. Sends letters, values claims.</td><td>Working because legal letters and advice are not reserved activities in the UK. Respondent lawyers are already pushing back on AI drafted claims.</td><td><span class="pill warn">Does not copy directly</span> The UK legal basis does not exist in Brazil.</td></tr>
+      <tr><td><b>Contend</b><div class="note">UK</div></td><td>AI interface to draft legal letters and claims.</td><td>Direct competitor in the same space.</td><td>Quality and trust, not drafting, is the differentiator.</td></tr>
+      <tr><td><b>Garfield</b><div class="note">UK</div></td><td>AI litigation assistant for SME debt claims up to £10,000.</td><td>Authorised by the SRA in May 2025 as the first regulated AI law firm.</td><td><span class="pill ok">Path exists</span> Working with the regulator beats working around it.</td></tr>
+      <tr><td><b>DoNotPay</b><div class="note">US</div></td><td>Marketed as "the world's first robot lawyer".</td><td>FTC final order (Feb 2025) banning deceptive AI lawyer claims, with monetary relief.</td><td><span class="pill bad">Avoid</span> Never market as a lawyer. Claims must be backed by evals.</td></tr>
+      <tr><td><b>Enter</b><div class="note">Brazil</div></td><td>Agentic AI that automates consumer claims against large companies. Unicorn, valued at US$1.2bn (May 2026).</td><td>OAB-SP filed a public civil action in Oct 2026 to limit its AI to lawyers.</td><td><span class="pill bad">High risk</span> Even well funded players are being challenged.</td></tr>
+      <tr><td><b>Airline claim startups</b><div class="note">Brazil</div></td><td>Platforms that promise compensation for flight problems.</td><td>OAB/RJ filed seven lawsuits calling the service illegal. In 2024 a federal court rejected an OAB request against a legaltech.</td><td><span class="pill warn">Grey zone</span> Outcomes are mixed; budget for legal fights.</td></tr>
+      <tr><td><b>Jusbrasil</b><div class="note">Brazil</div></td><td>Guides people through their case, generates documents, connects them to registered lawyers.</td><td>Operating at scale as a guide plus lawyer marketplace.</td><td><span class="pill ok">Closest safe model</span> Guide and connect, let lawyers advise.</td></tr>
+    </table>
+  </div>
+
+  <div class="grid2">
+    <div class="card">
+      <h3><span class="pill ok">Could work</span></h3>
+      <ul class="tight">
+        <li><b>Lawyer in the loop:</b> Grapple's intake, triage, drafting and quality gate, with a partner labour lawyer who advises and signs. Mirrors Grapple's own structure inside Monaco Solicitors.</li>
+        <li><b>B2B tool for labour law firms:</b> with 3.6 million new cases a year, productivity for lawyers is a big market and avoids the OAB conflict.</li>
+        <li><b>Free information and calculators</b> (rights, deadlines, claim value) as top of funnel, handing off to lawyers.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3><span class="pill bad">Could NOT work</span></h3>
+      <ul class="tight">
+        <li><b>Copying the UK "no lawyers" model:</b> legal advice is reserved for lawyers, and the OAB is actively suing.</li>
+        <li><b>"AI lawyer" marketing:</b> fails with the OAB and, as DoNotPay showed, with consumer regulators.</li>
+        <li><b>A pure price pitch:</b> many labour lawyers already charge nothing upfront and take a share of the result. <span class="note">(Assumption to validate.)</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3><span class="pill warn">Unproven: test before scaling</span></h3>
+    <ul class="tight">
+      <li><b>Do letters settle?</b> Many employers may wait for the court conciliation hearing instead. Measure reply and settlement rate per letter in a small pilot.</li>
+      <li><b>Cost of losing for workers:</b> a losing worker can be ordered to pay the other side's legal fees (5% to 15%, CLT art. 791-A). For workers on free legal aid, the STF suspended this for 2 years (ADI 5766), so the risk is lower but real. The quality gate protects users, not only the brand.</li>
+      <li><b>Success fee structure:</b> fee arrangements between a tech company and lawyers have specific ethics rules. Needs legal review.</li>
+    </ul>
+  </div>
+
+  <div class="card" style="background:#fbfaf6">
+    <h3>Verdict</h3>
+    <p style="margin:0"><b>The tech travels, the business model does not.</b> Enter Brazil as the tool that makes labour lawyers faster and safer, not as their replacement: partner with a Brazilian labour law firm, start with the four end of employment playbooks in one state, and prove letter to settlement conversion before scaling.</p>
+  </div>
+
+  <div class="card">
+    <h3>Sources</h3>
+    <ul class="tight" style="font-size:13px">
+      <li><a href="https://www.csjt.jus.br/web/csjt/-/julgamentos-na-justi%C3%A7a-do-trabalho-superaram-4-milh%C3%B5es-em-2024">CSJT: Julgamentos na Justiça do Trabalho superaram 4 milhões em 2024</a></li>
+      <li><a href="https://www.planalto.gov.br/ccivil_03/leis/l8906.htm">Lei 8.906/94 (Estatuto da OAB)</a></li>
+      <li><a href="https://oglobo.globo.com/economia/tecnologia/noticia/2026/10/09/oab-sp-entra-com-acao-civil-publica-contra-a-legaltech-enter.ghtml">O Globo: OAB-SP entra com ação civil pública contra a legaltech Enter</a></li>
+      <li><a href="https://www.migalhas.com.br/quentes/320234/startups-prometem-indenizacao-por-problemas-no-setor-aereo-para-oab-servico-e-ilegal">Migalhas: Startups do setor aéreo; para OAB, serviço é ilegal</a></li>
+      <li><a href="https://www.jota.info/opiniao-e-analise/artigos/oab-vs-enter-a-tentativa-de-regulamentar-ia-na-advocacia-por-meio-de-sentenca">JOTA: OAB vs. Enter</a></li>
+      <li><a href="https://www.jusbrasil.com.br/">Jusbrasil</a></li>
+      <li><a href="https://www.ftc.gov/news-events/news/press-releases/2025/02/ftc-finalizes-order-donotpay-prohibits-deceptive-ai-lawyer-claims-imposes-monetary-relief-requires">FTC: Final order with DoNotPay</a></li>
+      <li><a href="https://www.garfield.law/press/garfield-ai-becomes-first-sra-regulated-legal-ai">Garfield: First SRA regulated AI law firm</a></li>
+      <li><a href="https://www.artificiallawyer.com/2025/12/15/law-without-lawyers-meet-grapple/">Artificial Lawyer: Meet Grapple</a></li>
+      <li><a href="https://www.3pb.co.uk/grapple-law-ai-claim-generators-and-what-respondent-solicitors-need-to-know/">3PB: Grapple Law and AI claim generators</a></li>
+      <li><a href="https://www.barbieriadvogados.com/adi-5766-honorarios-periciais-processo-trabalho/">ADI 5766: honorários e justiça gratuita</a></li>
+    </ul>
+  </div>
+</section>
+
+<!-- ============ HOW ============ -->
+<section class="view" id="v-how">
+  <h2>How it is built</h2>
+  <p class="sub">Every part runs in this page. The architecture maps one to one to what I would build in production.</p>
+  <div class="card">
+    <div class="arch">
+      <span>Story</span><em>→</em><span>PII redaction (code)</span><em>→</em><span>Triage · Haiku: playbook + facts</span><em>→</em><span>Pre checks (code): scope, time limit, required facts</span><em>→</em><span>Retriever: mandatory + BM25</span><em>→</em><span>Model A · Haiku</span><span>Model B · Sonnet</span><em>→</em><span>Guardrails + citation verifier (code)</span><em>→</em><span>Judge · Opus, blind</span><em>→</em><span>Score + gate</span><span>Value calculator (code)</span><em>→</em><span>Send / lawyer review / refuse</span><em>→</em><span>Event log → funnel</span>
+    </div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <h3>Design decisions</h3>
+      <ul class="tight">
+        <li><b>RAG holds the law, playbooks hold the letters.</b> Retrieval finds which rules apply. The letter structure comes from one playbook per case type, written and approved by a lawyer. Models fill playbooks; they do not invent them.</li>
+        <li><b>One niche first.</b> Four end of employment playbooks, everything else turned away. Easier to test, to get right, and to explain to a regulator.</li>
+        <li><b>Stop early, stop cheap.</b> Out of scope, time barred or missing facts are caught after one small model call, before the expensive ones.</li>
+        <li><b>Code before AI for facts.</b> Whether a quote exists in a source is checked by string matching, not by a model. Models only judge things that need judgement.</li>
+        <li><b>Two models, one judge.</b> Lets us pick the cheapest model that passes the gate, and spot regressions when prompts or models change.</li>
+        <li><b>Blind, shuffled judging</b> to reduce self preference and position bias.</li>
+        <li><b>Refusal is a feature.</b> Grapple's promise is that it will not send a weak letter. The gate makes that measurable.</li>
+        <li><b>Style guard.</b> Drafts are told to avoid typical AI tells (like em dashes) that opposing lawyers already flag.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3>Corpus</h3>
+      <div id="corpusList"></div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>How we would know the letters are right</h3>
+    <ul class="tight">
+      <li>A Brazilian labour lawyer writes each playbook and 20 gold standard letters per playbook.</li>
+      <li>Every lawyer edit during review is saved and turned into new test cases.</li>
+      <li>The judge is calibrated against lawyer scores; once agreement is high enough, it reviews alone and lawyers sample.</li>
+      <li>Weekly regression run: every prompt or model change is tested on the full set before release.</li>
+    </ul>
+  </div>
+  <p class="note">Demo only. Not legal advice. Sample cases are fictional. The legal texts were taken from public secondary sources and have not been reviewed by a lawyer.</p>
+</section>
+
+</main>
+
+<script>
+/* ---------------- CORPUS (real provisions, verified text) ---------------- */
+const CORPUS = [
+ {id:"CLT-59", ref:"CLT, art. 59, caput e § 1º", topic:"Horas extras",
+  text:"A duração diária do trabalho poderá ser acrescida de horas extras, em número não excedente de duas, por acordo individual, convenção coletiva ou acordo coletivo de trabalho. § 1º A remuneração da hora extra será, pelo menos, 50% (cinquenta por cento) superior à da hora normal.",
+  tags:"hora extra horas extras jornada sobrejornada 50% adicional trabalhava mais de 8 horas",
+  url:"https://www.jusbrasil.com.br/topicos/10759850/artigo-59-do-decreto-lei-n-5452-de-01-de-maio-de-1943"},
+ {id:"CLT-74-2", ref:"CLT, art. 74, § 2º", topic:"Controle de ponto",
+  text:"Para os estabelecimentos com mais de 20 (vinte) trabalhadores será obrigatória a anotação da hora de entrada e de saída, em registro manual, mecânico ou eletrônico, conforme instruções expedidas pela Secretaria Especial de Previdência e Trabalho do Ministério da Economia, permitida a pré-assinalação do período de repouso.",
+  tags:"ponto registro de ponto controle de jornada cartão de ponto funcionários empregados caderno",
+  url:"https://www.jusbrasil.com.br/topicos/10758212/paragrafo-2-artigo-74-do-decreto-lei-n-5452-de-01-de-maio-de-1943"},
+ {id:"TST-S338", ref:"TST, Súmula 338, I", topic:"Ônus da prova da jornada",
+  text:"É ônus do empregador que conta com mais de 10 (dez) empregados o registro da jornada de trabalho na forma do art. 74, § 2º, da CLT. A não-apresentação injustificada dos controles de frequência gera presunção relativa de veracidade da jornada de trabalho, a qual pode ser elidida por prova em contrário.",
+  tags:"prova jornada ponto horas extras registro controle frequência presunção",
+  note:"Written when the CLT threshold was 10 employees; art. 74 § 2º now says 20. A good judge should notice.",
+  url:"https://www.jusbrasil.com.br/jurisprudencia/tst/sumulas/sumula-n-338-do-tst/1431370228"},
+ {id:"CLT-477-6", ref:"CLT, art. 477, § 6º", topic:"Prazo das verbas rescisórias",
+  text:"A entrega ao empregado de documentos que comprovem a comunicação da extinção contratual aos órgãos competentes bem como o pagamento dos valores constantes do instrumento de rescisão ou recibo de quitação deverão ser efetuados até dez dias contados a partir do término do contrato.",
+  tags:"rescisão verbas rescisórias demissão demitido prazo dez dias guias seguro-desemprego documentos pagamento atrasado",
+  url:"https://www.jusbrasil.com.br/topicos/10710324/artigo-477-do-decreto-lei-n-5452-de-01-de-maio-de-1943"},
+ {id:"CLT-477-8", ref:"CLT, art. 477, § 8º", topic:"Multa por atraso na rescisão",
+  text:"A inobservância do disposto no § 6º deste artigo sujeitará o infrator à multa de 160 BTN, por trabalhador, bem assim ao pagamento da multa a favor do empregado, em valor equivalente ao seu salário, devidamente corrigido pelo índice de variação do BTN, salvo quando, comprovadamente, o trabalhador der causa à mora.",
+  tags:"multa atraso rescisão verbas rescisórias salário multa do 477 demissão",
+  url:"https://www.jusbrasil.com.br/topicos/10710324/artigo-477-do-decreto-lei-n-5452-de-01-de-maio-de-1943"},
+ {id:"TST-IRR-477", ref:"TST, tese vinculante (IRR), multa do art. 477", topic:"Atraso na entrega de documentos",
+  text:"Extinto o contrato de trabalho na vigência da Lei nº 13.467/2017, é devida a aplicação da multa do artigo 477, § 8º, da CLT quando o empregador deixar de entregar os documentos que comprovem a comunicação da extinção contratual aos órgãos competentes em até dez dias do término do contrato, ainda que as verbas rescisórias sejam pagas no referido prazo.",
+  tags:"documentos guias seguro-desemprego atraso multa rescisão demissão",
+  url:"https://www.jusbrasil.com.br/topicos/10710324/artigo-477-do-decreto-lei-n-5452-de-01-de-maio-de-1943"},
+ {id:"CLT-483-d", ref:"CLT, art. 483, caput, alínea d e § 3º", topic:"Rescisão indireta",
+  text:"O empregado poderá considerar rescindido o contrato e pleitear a devida indenização quando: d) não cumprir o empregador as obrigações do contrato; § 3º Nas hipóteses das letras d e g, poderá o empregado pleitear a rescisão de seu contrato de trabalho e o pagamento das respectivas indenizações, permanecendo ou não no serviço até final decisão do processo.",
+  tags:"rescisão indireta sair da empresa sem perder direitos empregador descumpre obrigações salário atrasado fgts",
+  url:"https://www.jusbrasil.com.br/topicos/10708868/artigo-483-do-decreto-lei-n-5452-de-01-de-maio-de-1943"},
+ {id:"TST-T70", ref:"TST, Tema 70 (recurso repetitivo)", topic:"FGTS não depositado",
+  text:"A ausência ou irregularidade no recolhimento dos depósitos de FGTS caracteriza descumprimento de obrigação contratual, nos termos do art. 483, d, da CLT, suficiente para configurar a rescisão indireta do contrato de trabalho, sendo desnecessário o requisito da imediatidade.",
+  tags:"fgts depósito não deposita rescisão indireta falta grave empregador",
+  url:"https://www.jusbrasil.com.br/topicos/10708868/artigo-483-do-decreto-lei-n-5452-de-01-de-maio-de-1943"},
+ {id:"ADCT-10-IIb", ref:"ADCT, art. 10, II, b", topic:"Estabilidade da gestante",
+  text:"Até que seja promulgada a lei complementar a que se refere o art. 7º, I, da Constituição, fica vedada a dispensa arbitrária ou sem justa causa: b) da empregada gestante, desde a confirmação da gravidez até cinco meses após o parto.",
+  tags:"gestante grávida gravidez estabilidade demissão dispensa parto",
+  url:"https://www.lefisc.com.br/news/estabilidade_gestante.htm"},
+ {id:"TST-S244", ref:"TST, Súmula 244, I a III", topic:"Gestante: desconhecimento e contrato a prazo",
+  text:"I - O desconhecimento do estado gravídico pelo empregador não afasta o direito ao pagamento da indenização decorrente da estabilidade (art. 10, II, b do ADCT). II - A garantia de emprego à gestante só autoriza a reintegração se esta se der durante o período de estabilidade. Do contrário, a garantia restringe-se aos salários e demais direitos correspondentes ao período de estabilidade. III - A empregada gestante tem direito à estabilidade provisória prevista no art. 10, inciso II, alínea b, do ADCT, mesmo na hipótese de admissão mediante contrato por tempo determinado.",
+  tags:"gestante grávida empresa não sabia desconhecimento reintegração indenização contrato de experiência prazo determinado",
+  url:"https://www.tst.jus.br/documents/10157/2b196ee1-5d44-43ea-b197-51ba0e30da21"},
+ {id:"CF-7-XXIX", ref:"Constituição Federal, art. 7º, XXIX", topic:"Prazo para reclamar",
+  text:"ação, quanto aos créditos resultantes das relações de trabalho, com prazo prescricional de cinco anos para os trabalhadores urbanos e rurais, até o limite de dois anos após a extinção do contrato de trabalho;",
+  tags:"prazo prescrição dois anos cinco anos demitido há quanto tempo processar",
+  url:"https://www.jusbrasil.com.br/noticias/a-prescricao-no-ambito-do-trabalho-rural-em-face-da-emenda-constitucional-n-28/1645585"},
+ {id:"CLT-791", ref:"CLT, art. 791 + TST Súmula 425", topic:"Reclamar sem advogado",
+  text:"Os empregados e os empregadores poderão reclamar pessoalmente perante a Justiça do Trabalho e acompanhar as suas reclamações até o final. O jus postulandi das partes, estabelecido no art. 791 da CLT, limita-se às Varas do Trabalho e aos Tribunais Regionais do Trabalho, não alcançando a ação rescisória, a ação cautelar, o mandado de segurança e os recursos de competência do Tribunal Superior do Trabalho.",
+  tags:"sem advogado pessoalmente justiça do trabalho reclamação processar sozinho",
+  url:"https://www.jusbrasil.com.br/legislacao/111983249/consolidacao-das-leis-do-trabalho-decreto-lei-5452-43"},
+ {id:"OAB-1", ref:"Lei 8.906/94 (Estatuto da OAB), art. 1º", topic:"Atividades privativas de advogado",
+  text:"São atividades privativas de advocacia: I - a postulação a qualquer órgão do Poder Judiciário e aos juizados especiais; II - as atividades de consultoria, assessoria e direção jurídicas.",
+  tags:"advogado oab consultoria jurídica privativa",
+  url:"https://www.planalto.gov.br/ccivil_03/leis/l8906.htm"}
+];
+
+/* ---------------- PLAYBOOKS (one per intent; to be written and approved by a Brazilian labour lawyer) ---------------- */
+const PLAYBOOKS = {
+ severance:{n:1, en:"Late severance pay", pt:"Cobrança de verbas rescisórias",
+  when:"Dismissed, and severance or exit documents not delivered within 10 days",
+  requiredFacts:["days_since_termination","severance_paid"], requiredSources:["CLT-477-6","CLT-477-8"], deadlineDays:5,
+  skeleton:["Identificação do trabalhador e da empresa","Fatos: data da dispensa e o que não foi pago ou entregue","Fundamento: prazo de 10 dias e multa de um salário","Pedido: pagamento das verbas e da multa, entrega dos documentos","Prazo para resposta e próximos passos","Assinatura do trabalhador"]},
+ indirect:{n:2, en:"Leave without losing rights", pt:"Notificação de rescisão indireta",
+  when:"Still employed, employer breaks core obligations (FGTS not deposited, salary late)",
+  requiredFacts:["still_employed"], requiredSources:["CLT-483-d","TST-T70"], deadlineDays:5,
+  skeleton:["Identificação do trabalhador e da empresa","Fatos: quais obrigações estão sendo descumpridas e desde quando","Fundamento: descumprimento contratual e rescisão indireta","Pedido: regularização imediata ou reconhecimento da rescisão indireta","Prazo para resposta e próximos passos","Assinatura do trabalhador"]},
+ pregnancy:{n:3, en:"Dismissed while pregnant", pt:"Pedido de reintegração da gestante",
+  when:"Dismissed without just cause while pregnant, even if the employer did not know",
+  requiredFacts:["pregnant_weeks_at_dismissal"], requiredSources:["ADCT-10-IIb","TST-S244"], deadlineDays:5,
+  skeleton:["Identificação da trabalhadora e da empresa","Fatos: data da dispensa e confirmação da gravidez","Fundamento: estabilidade da gestante, mesmo sem conhecimento do empregador","Pedido: reintegração ou indenização do período de estabilidade","Prazo para resposta e próximos passos","Assinatura da trabalhadora"]},
+ overtime:{n:4, en:"Unpaid overtime at exit", pt:"Cobrança de horas extras",
+  when:"Worked beyond normal hours without overtime pay",
+  requiredFacts:["extra_hours_per_week","months_worked"], requiredSources:["CLT-59","CLT-74-2"], deadlineDays:5,
+  skeleton:["Identificação do trabalhador e da empresa","Fatos: jornada praticada e período","Fundamento: adicional de 50% e dever de controle de ponto","Pedido: pagamento das horas extras ou apresentação dos controles de ponto","Prazo para resposta e próximos passos","Assinatura do trabalhador"]}
+};
+
+const CASES = [
+ {k:"severance", t:"Late severance pay", g:"Playbook 1 · includes a CPF to show redaction",
+  x:"Fui demitido sem justa causa há 25 dias. Até hoje a empresa não pagou minhas verbas rescisórias e também não entregou as guias do seguro-desemprego. Meu salário era R$ 3.200. Meu CPF é 123.456.789-09. O RH só diz que está resolvendo."},
+ {k:"indirect", t:"FGTS not deposited", g:"Playbook 2 · still employed",
+  x:"Ainda trabalho numa empresa de logística, mas olhei no app do FGTS e ela não deposita meu FGTS há 8 meses. Meu salário é R$ 4.000. Eu quero sair da empresa sem perder meus direitos, mas não quero pedir demissão."},
+ {k:"pregnancy", t:"Dismissed while pregnant", g:"Playbook 3 · employer says it did not know",
+  x:"Fui demitida sem justa causa há 1 mês. Duas semanas depois descobri que já estava grávida de 6 semanas no dia da demissão. A empresa diz que não sabia da gravidez e por isso não me deve nada. Eu estava em contrato de experiência de 90 dias e meu salário era R$ 2.800."},
+ {k:"overtime", t:"Unpaid overtime", g:"Playbook 4 · no time clock",
+  x:"Trabalhei 2 anos numa loja de roupas em Florianópolis que tem uns 40 funcionários. Ganhava R$ 2.400 por mês. Eu fazia 10 horas por dia, de segunda a sábado, e nunca recebi hora extra. A loja não tinha relógio de ponto, o gerente só anotava num caderno. Fui demitida sem justa causa há 3 meses."},
+ {k:"barred", t:"Time barred", g:"Pre check stops it before drafting",
+  x:"Fui demitido há 3 anos e a empresa nunca pagou minhas verbas rescisórias. Meu salário era R$ 2.000."},
+ {k:"scope", t:"Out of scope", g:"Not an employment exit case",
+  x:"Meu vizinho fez uma obra e rachou a parede do meu apartamento. Quero que ele pague o conserto."}
+];
+
+const MODELS = {
+  A:{label:"Model A", name:"claude-haiku-5-5", tier:"quick", nick:"Haiku"},
+  B:{label:"Model B", name:"claude-sonnet-5-5", tier:"default", nick:"Sonnet"},
+  C:{label:"Judge", name:"claude-opus-5-5", tier:"complex", nick:"Opus"},
+  X:{label:"Triage", name:"claude-haiku-5-5", tier:"quick", nick:"Haiku"}
+};
+/* Assumed USD per million tokens (input, output). Placeholder list prices: check current pricing. */
+const PRICE = {"claude-haiku-5-5":[1,5],"claude-sonnet-5-5":[3,15],"claude-opus-5-5":[5,25]};
+
+/* ---------------- helpers ---------------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const norm = s => String(s||"").normalize("NFD").replace(/[̀-ͯ]/g,"").toLowerCase();
+const fmtR = v => "R$ " + Math.round(v).toLocaleString("pt-BR");
+const STOP = new Set("a o e de da do das dos em no na nos nas um uma uns umas que por para com sem se ao aos as os eu me meu minha mas nao ja foi era ser ter tem ha so mais muito como isso esta este essa esse ate quando the and of to".split(" "));
+function toks(s){ return norm(s).split(/[^a-z0-9%]+/).filter(w=>w.length>1 && !STOP.has(w)).map(w=>w.length>4 ? w.replace(/(oes|aes|es|s)$/,"") : w); }
+function parseJSON(t){ if(!t) throw new Error("empty"); const a=t.indexOf("{"), b=t.lastIndexOf("}"); return JSON.parse(t.slice(a,b+1)); }
+
+/* BM25 */
+const DOCS = CORPUS.map(d => toks(d.topic+" "+d.text+" "+d.tags+" "+d.tags));
+const AVG = DOCS.reduce((a,d)=>a+d.length,0)/DOCS.length;
+const DF = {}; DOCS.forEach(d => new Set(d).forEach(t => DF[t]=(DF[t]||0)+1));
+function bm25(q){
+  const qt = [...new Set(toks(q))], k1=1.4, b=0.75, N=DOCS.length;
+  return CORPUS.map((c,i)=>{ const d=DOCS[i]; let s=0;
+    qt.forEach(t=>{ const f=d.filter(x=>x===t).length; if(!f) return;
+      const idf=Math.log(1+(N-DF[t]+.5)/(DF[t]+.5)); s+=idf*(f*(k1+1))/(f+k1*(1-b+b*d.length/AVG)); });
+    return {c, s};
+  }).sort((a,b)=>b.s-a.s);
+}
+
+/* PII redaction (code, before any model sees the text) */
+function redact(t){
+  let n=0; const sub=(re,tag)=>{ t=t.replace(re,()=>{n++;return tag;}); };
+  sub(/\b\d{3}\.?\d{3}\.?\d{3}-?\d{2}\b/g,"[CPF]");
+  sub(/\b\d{2}\.?\d{3}\.?\d{3}\/?\d{4}-?\d{2}\b/g,"[CNPJ]");
+  sub(/[\w.+-]+@[\w-]+\.[\w.]+/g,"[EMAIL]");
+  sub(/(\+?55\s?)?\(?\d{2}\)?\s?9?\d{4}-?\d{4}\b/g,"[TELEFONE]");
+  return {text:t, n};
+}
+
+/* ---------------- tabs ---------------- */
+document.querySelectorAll("#nav button").forEach(b=>b.onclick=()=>{
+  document.querySelectorAll("#nav button").forEach(x=>x.classList.toggle("on",x===b));
+  document.querySelectorAll("section.view").forEach(v=>v.classList.toggle("on",v.id==="v-"+b.dataset.v));
+  if(b.dataset.v==="funnel") renderCompare();
+});
+
+/* ---------------- intake UI ---------------- */
+$("#pbList").innerHTML = Object.values(PLAYBOOKS).map(p=>`<div class="pb"><b>Letter ${p.n} · ${esc(p.en)}</b><div class="note">${esc(p.pt)}</div><div class="note">${esc(p.when)}</div></div>`).join("");
+let current = CASES[0].k;
+function renderCases(){
+  $("#cases").innerHTML = CASES.map(c=>`<button class="case ${c.k===current?"on":""}" data-k="${c.k}"><div class="t">${esc(c.t)}</div><div class="g">${esc(c.g)}</div></button>`).join("");
+  document.querySelectorAll(".case").forEach(b=>b.onclick=()=>{ current=b.dataset.k; $("#caseText").value=CASES.find(c=>c.k===current).x; renderCases(); });
+}
+renderCases(); $("#caseText").value = CASES[0].x;
+$("#caseText").addEventListener("input",()=>{ current=null; renderCases(); });
+
+function setStep(n, done){ document.querySelectorAll(".step").forEach(s=>{ const k=+s.dataset.s; s.classList.toggle("active",k===n); s.classList.toggle("done", k<n || (done && k===n)); }); }
+function show(id){ $(id).classList.remove("hidden"); }
+const CARDS = ["#triageCard","#retrCard","#draftCard","#verifyCard","#judgeCard","#gateCard","#doneCard"];
+function hideAll(){ CARDS.forEach(i=>$(i).classList.add("hidden")); }
+
+/* ---------------- model calls ---------------- */
+/* Lovable version: models are called through a Supabase Edge Function named "llm". Fill these two values. */
+const SUPABASE_URL = "https://c--00c05026-8f4d-4f26-99a1-d569c30e5afa-prod.lovable.cloud";
+const SUPABASE_ANON_KEY = "sb_publishable_yJ4TXcT9_es0oY2whrmR4A_0Zh4vqYH";
+const sample = async (prompt, opts={}) => {
+  const res = await fetch(`${SUPABASE_URL}/functions/v1/llm`, {
+    method:"POST",
+    headers:{ "Content-Type":"application/json", "apikey":SUPABASE_ANON_KEY, "Authorization":`Bearer ${SUPABASE_ANON_KEY}` },
+    body: JSON.stringify({ prompt, model: opts.model })
+  });
+  const j = await res.json().catch(()=>({}));
+  if(!res.ok) throw { code: res.status===429 ? "rate_limited" : "api_error", message: j.error || `HTTP ${res.status}` };
+  return { text:j.text, modelApplied:j.model, usage:j.usage };
+};
+async function callModel(key, prompt, onText){
+  const m = MODELS[key];
+  const t0 = performance.now();
+  const r = await sample(prompt, { modelTier:m.tier, model:m.name, cache:false, onText: onText?({text})=>onText(text):undefined });
+  const ms = performance.now()-t0;
+  const inTok = r.usage?.input_tokens ?? Math.round(prompt.length/4), outTok = r.usage?.output_tokens ?? Math.round((r.text||"").length/4);
+  const pr = PRICE[m.name] || [3,15];
+  return { text:r.text, applied:r.modelApplied || m.name, ms, inTok, outTok, cost:(inTok*pr[0]+outTok*pr[1])/1e6 };
+}
+
+/* ---------------- prompts ---------------- */
+function triagePrompt(story){
+  return `You are the triage step of a Brazilian labour law self-help product that ONLY handles end of employment disputes.
+Classify the worker's story into exactly one playbook, and extract facts. Use null when a fact is not stated. Never guess.
+
+PLAYBOOKS
+${Object.entries(PLAYBOOKS).map(([k,p])=>`- ${k}: ${p.when}`).join("\n")}
+- out_of_scope: anything else (not about employment, or not about the end of an employment relationship)
+
+STORY
+${story}
+
+Reply with ONLY valid JSON:
+{"playbook":"severance|indirect|pregnancy|overtime|out_of_scope","confidence":0.0,"reason_en":"one sentence","facts":{"monthly_salary_brl":null,"months_worked":null,"extra_hours_per_week":null,"months_since_termination":null,"days_since_termination":null,"still_employed":null,"pregnant_weeks_at_dismissal":null,"severance_paid":null,"fgts_months_unpaid":null}}`;
+}
+function draftPrompt(story, pb, srcs, facts){
+  return `You draft an extrajudicial notice ("notificação extrajudicial") that a Brazilian worker sends to the employer IN THEIR OWN NAME.
+
+PLAYBOOK: Letter ${pb.n} · ${pb.pt}
+Follow this structure, in this order:
+${pb.skeleton.map((x,i)=>`${i+1}. ${x}`).join("\n")}
+Deadline for the employer to answer: ${pb.deadlineDays} dias úteis.
+You MUST cite these sources: ${pb.requiredSources.join(", ")}.
+
+HARD RULES
+- Use ONLY the sources below. Never cite anything else. Never invent case law.
+- Every legal claim cites one source_id and has "quote": an EXACT substring copied from that source (max 30 words).
+- Only use money amounts the worker gave. Do not calculate totals.
+- Never say or imply you are a lawyer, a law firm or the OAB. The worker signs.
+- No threats (press, social media, police), no promises of results.
+- Keep placeholders exactly as given, like [CPF]. Use [NOME DO TRABALHADOR] and [NOME DA EMPRESA] where names are unknown.
+- Brazilian Portuguese, plain and firm. No em dashes or en dashes.
+- If facts are weak, say so honestly in case_strength and missing_evidence.
+
+SOURCES
+${srcs.map(r=>`[${r.c.id}] ${r.c.ref}: ${r.c.text}`).join("\n")}
+
+FACTS EXTRACTED
+${JSON.stringify(facts)}
+
+WORKER'S STORY (personal data redacted)
+${story}
+
+Reply with ONLY valid JSON, no markdown:
+{"summary_en":"one sentence in English for a UK reviewer","case_strength":"strong|medium|weak","missing_evidence":["..."],"claims":[{"claim_pt":"...","source_id":"...","quote":"..."}],"demand_pt":"what the worker asks for and the deadline","letter_pt":"the full notice, 150 to 280 words"}`;
+}
+function judgePrompt(story, pb, srcs, drafts){
+  return `You are a strict senior Brazilian labour lawyer reviewing AI-drafted notices before they are sent. You do not know who wrote them.
+The notices should follow playbook "${pb.pt}".
+
+SOURCES AVAILABLE
+${srcs.map(r=>`[${r.c.id}] ${r.c.ref}: ${r.c.text}`).join("\n")}
+
+CASE
+${story}
+
+${drafts.map((d,i)=>`DRAFT ${i+1}
+Claims:
+${(d.out.claims||[]).map((c,j)=>`  ${j}. "${c.claim_pt}" cites [${c.source_id}] quote: "${c.quote}"`).join("\n")}
+Demand: ${d.out.demand_pt}
+Letter:
+${d.out.letter_pt}`).join("\n\n")}
+
+For each claim: support 0-5 (does the source support the claim as stated?) and strength 0-5 (how strong for THIS worker's facts; watch thresholds, deadlines and outdated wording).
+For each draft: clarity 0-5, tone 0-5 (firm, not aggressive), actionability 0-5 (clear demand and deadline), overreach true/false, verdict "send" | "review" | "refuse".
+
+Reply with ONLY valid JSON, no markdown:
+{"drafts":[{"draft":1,"claims":[{"i":0,"support":0,"strength":0,"note_en":"short"}],"clarity":0,"tone":0,"actionability":0,"overreach":false,"verdict":"send","rationale_en":"two sentences"}],"preferred":1,"why_en":"one sentence"}`;
+}
+
+/* ---------------- code guardrails ---------------- */
+function guardrails(out, pb, facts, retrievedIds){
+  const L = out.letter_pt || "";
+  const words = L.split(/\s+/).filter(Boolean).length;
+  const cited = new Set((out.claims||[]).map(c=>c.source_id));
+  const allowed = [facts.monthly_salary_brl].filter(Boolean);
+  const amounts = [...L.matchAll(/R\$\s?([\d.]+(?:,\d{2})?)/g)].map(m=>+m[1].replace(/\./g,"").replace(",","."));
+  const invented = amounts.filter(a=>!allowed.some(x=>Math.abs(a-x)/x<0.01));
+  const missingReq = pb.requiredSources.filter(id=>!cited.has(id));
+  const outside = [...cited].filter(id=>!retrievedIds.has(id));
+  const checks = [
+    {k:"Required sources cited", hard:true, ok:!missingReq.length, d: missingReq.length?`Missing ${missingReq.join(", ")}`:pb.requiredSources.join(", ")},
+    {k:"Only retrieved sources used", hard:true, ok:!outside.length, d: outside.length?`Outside retrieval: ${outside.join(", ")}`:"All citations come from step 3"},
+    {k:"No lawyer impersonation", hard:true, ok:!/(sou advogad|como advogad|escrit[oó]rio de advocacia|OAB\s*\/|\bOAB\s*n|advogado\(a\)\s+do)/i.test(L), d:"The worker signs, not a lawyer"},
+    {k:"No invented amounts", hard:true, ok:!invented.length, d: invented.length?`Not from the user: ${invented.map(fmtR).join(", ")}`:`Amounts found: ${amounts.length?amounts.map(fmtR).join(", "):"none"}`},
+    {k:"No threats", hard:true, ok:!/(imprensa|m[ií]dia|redes sociais|pol[ií]cia|expor (a|essa) empresa|vou destruir)/i.test(L), d:"Press, social media, police"},
+    {k:"No guaranteed outcomes", hard:false, ok:!/(garant(o|imos) que|com certeza (vai|v[aã]o|ganh)|certamente (ganh|receb))/i.test(L), d:"Never promise a result"},
+    {k:"Personal data stays redacted", hard:false, ok:!/\b\d{3}\.\d{3}\.\d{3}-\d{2}\b/.test(L), d:"No raw CPF in the draft"},
+    {k:"Deadline stated", hard:false, ok:/\d+\s*\(?\w*\)?\s*dias/i.test(L), d:`Playbook asks for ${pb.deadlineDays} dias úteis`},
+    {k:"No em or en dashes", hard:false, ok:!/[—–]/.test(L), d:"Common AI tell flagged by opposing lawyers"},
+    {k:"Length 120 to 320 words", hard:false, ok:words>=120 && words<=320, d:`${words} words`}
+  ];
+  return {checks, hardFail: checks.some(c=>c.hard && !c.ok), softFails: checks.filter(c=>!c.hard && !c.ok).length};
+}
+function verifyClaims(out, retrievedIds){
+  return (out.claims||[]).map(cl=>{
+    const src = CORPUS.find(c=>c.id===cl.source_id);
+    if(!src) return {...cl, status:"hallucinated", factor:0, why:"Source ID does not exist"};
+    const nq = norm(cl.quote).replace(/[^a-z0-9% ]/g," ").replace(/\s+/g," ").trim();
+    const ns = norm(src.text).replace(/[^a-z0-9% ]/g," ").replace(/\s+/g," ");
+    const inRetr = retrievedIds.has(src.id);
+    if(nq && ns.includes(nq)) return {...cl, status: inRetr?"verified":"outside", factor: inRetr?1:.6, why: inRetr?"Exact quote found":"Quote exists, source not retrieved"};
+    const qt = toks(cl.quote), st = new Set(toks(src.text)); const ov = qt.length ? qt.filter(t=>st.has(t)).length/qt.length : 0;
+    if(ov>=.8) return {...cl, status:"near", factor:.7, why:`Paraphrased, ${Math.round(ov*100)}% overlap`};
+    return {...cl, status:"misquoted", factor:.2, why:`Quote not in source (${Math.round(ov*100)}% overlap)`};
+  });
+}
+const STATUS_PILL = {verified:"ok",near:"warn",outside:"warn",misquoted:"bad",hallucinated:"bad"};
+
+/* ---------------- scoring ---------------- */
+function scoreDraft(ver, j, g){
+  const claims = ver.map((c,i)=>{ const jc=(j.claims||[]).find(x=>+x.i===i)||{support:0,strength:0}; return {...c, support:+jc.support||0, strength:+jc.strength||0}; });
+  const n = claims.length || 1;
+  const acc = claims.length ? claims.reduce((a,c)=>a+c.factor*(c.support/5),0)/n*100 : 0;
+  const valid = claims.filter(c=>c.factor>0);
+  const str = valid.length ? valid.reduce((a,c)=>a+c.strength/5,0)/valid.length*100 : 0;
+  const qual = ((+j.clarity||0)+(+j.tone||0)+(+j.actionability||0))/15*100;
+  let overall = Math.max(0, Math.round(.5*acc + .3*str + .2*qual - (j.overreach?15:0) - 3*g.softFails));
+  const halluc = claims.some(c=>c.status==="hallucinated");
+  let gate = "refuse", reason = "";
+  if(halluc){ gate="refuse"; reason="A citation was invented."; }
+  else if(g.hardFail){ gate="review"; reason="A hard guardrail failed, so a human must check it."; }
+  else if(overall>=75 && j.verdict==="send"){ gate="send"; reason="Citations verified, guardrails passed, judge approves."; }
+  else if(overall>=55 && j.verdict!=="refuse"){ gate="review"; reason="Good but not clean enough to send alone."; }
+  else reason="Score too low or judge refused.";
+  return {claims, acc:Math.round(acc), str:Math.round(str), qual:Math.round(qual), overall, gate, reason, halluc, verdict:j.verdict, overreach:!!j.overreach, rationale:j.rationale_en||""};
+}
+const GATE = { send:{cls:"ok", t:"Ready to send"}, review:{cls:"warn", t:"Lawyer review"}, refuse:{cls:"bad", t:"Refused"} };
+
+/* ---------------- claim value (code, not AI) ---------------- */
+function computeValue(f, pbKey, salaryOverride){
+  const sal = salaryOverride ?? f.monthly_salary_brl; const rows=[], flags=[];
+  if(!sal){ flags.push("Salary not given. Ask the user before showing any amount."); return {rows,total:0,flags,sal}; }
+  const hourly = sal/220;
+  if(pbKey==="overtime" && f.extra_hours_per_week){ const m=Math.min(f.months_worked||0,60);
+    rows.push(["Unpaid overtime",`(${fmtR(sal)} ÷ 220) × 1.5 × ${f.extra_hours_per_week}h/week × 4.5 weeks × ${m} months`, hourly*1.5*f.extra_hours_per_week*4.5*m,"CLT-59"]); }
+  if(pbKey==="severance"){ rows.push(["Late severance penalty","1 monthly salary (payment over 10 days late)",sal,"CLT-477-8"]); flags.push("The unpaid severance itself depends on items the user has not listed yet (notice, vacation, 13th)."); }
+  if(pbKey==="pregnancy" && f.pregnant_weeks_at_dismissal){ const ml=Math.max(0,(40-f.pregnant_weeks_at_dismissal)/4.33)+5;
+    rows.push(["Pregnancy stability indemnity",`${fmtR(sal)} × ${ml.toFixed(1)} months (rest of pregnancy + 5 months after birth)`, sal*ml,"ADCT-10-IIb"]); }
+  if(pbKey==="indirect" && f.fgts_months_unpaid){ rows.push(["Missing FGTS deposits",`8% × ${fmtR(sal)} × ${f.fgts_months_unpaid} months`, .08*sal*f.fgts_months_unpaid,"TST-T70"]);
+    flags.push("If indirect dismissal is recognised, severance and the 40% FGTS fine add to this, but they need the full FGTS balance."); }
+  if(!rows.length) flags.push("No calculable item from the facts given.");
+  return {rows, total:rows.reduce((a,r)=>a+r[2],0), flags, sal};
+}
+let FACTS=null, PBKEY=null;
+function renderValue(salaryOverride){
+  const v = computeValue(FACTS, PBKEY, salaryOverride);
+  $("#valueOut").innerHTML = `
+    <div class="row" style="margin-bottom:8px"><label class="note">Monthly salary (R$) <input id="salIn" type="number" value="${v.sal||""}" style="width:110px;padding:6px;border:1px solid var(--line);border-radius:8px"></label></div>
+    ${v.rows.length?`<table><tr><th>Item</th><th>Formula</th><th>Source</th><th>Amount</th></tr>${v.rows.map(r=>`<tr><td>${r[0]}</td><td class="note">${esc(r[1])}</td><td><code>${r[3]}</code></td><td><b>${fmtR(r[2])}</b></td></tr>`).join("")}</table>`:""}
+    <div class="score"><div class="kpi"><div class="v">${fmtR(v.total*.7)} to ${fmtR(v.total)}</div><div class="l">Estimated range shown to the user. Low end assumes 30% lost in settlement or proof.</div></div></div>
+    ${v.flags.map(f=>`<p class="note" style="margin:4px 0">⚠ ${esc(f)}</p>`).join("")}
+    <p class="note">Simplified: no interest, correction or reflex items. A range, never a promise.</p>`;
+  const inp=$("#salIn"); if(inp) inp.onchange=()=>{ const vv=renderValue(+inp.value||null); LAST && (LAST.value=vv); renderDone(); };
+  return v;
+}
+
+/* ---------------- model card ---------------- */
+function modelCard(key, state, data){
+  const m = MODELS[key]; let body="";
+  if(state==="running") body = `<div class="stream" id="st${key}">Thinking…</div>`;
+  if(state==="error") body = `<p class="err">${esc(data)}</p>`;
+  if(state==="done"){ const o=data.out;
+    body = `<p style="margin:0 0 6px"><span class="pill ${o.case_strength==="strong"?"ok":o.case_strength==="weak"?"bad":"warn"}">case: ${esc(o.case_strength)}</span> <span class="note">${esc(data.applied)}</span></p>
+      <p class="note" style="margin:0 0 6px">⏱ ${(data.ms/1000).toFixed(1)}s · ~${data.inTok} in / ${data.outTok} out tokens · ~$${data.cost.toFixed(4)}</p>
+      <p style="margin:0 0 8px">${esc(o.summary_en)}</p>
+      ${(o.missing_evidence||[]).length?`<p class="note" style="margin:0 0 8px"><b>Missing evidence:</b> ${esc(o.missing_evidence.join("; "))}</p>`:""}
+      <details><summary>Read the letter (${(o.letter_pt||"").split(/\s+/).length} words)</summary><div class="letter" style="margin-top:8px">${esc(o.letter_pt)}</div></details>`; }
+  $("#m"+key).innerHTML = `<h3>${m.label} <span class="pill">${m.nick}</span></h3>${body}`;
+}
+
+/* ---------------- final screen + CTA ---------------- */
+let LAST = null;
+const caseId = () => "BR-" + String(1000 + LOG.length).padStart(4,"0");
+function renderDone(){
+  if(!LAST) return; const L = LAST; show("#doneCard");
+  const pb = L.pbKey ? PLAYBOOKS[L.pbKey] : null;
+  const head = (cls,title,sub)=>`<div class="donehead ${cls}"><div class="eyebrow2">${esc(L.id)} · ${pb?`Letter ${pb.n} · ${esc(pb.en)}`:"No playbook"}</div><h2 style="margin:4px 0">${title}</h2><p style="margin:0">${sub}</p></div>`;
+  let html="";
+  if(L.kind==="scope"){
+    html = head("bad","We can't take this case","This pilot only covers end of employment disputes. We tell the user that clearly, instead of guessing.")+
+      `<div class="ctarow"><button class="btn" data-act="refer">Show where to get help</button></div><div id="actOut"></div>`;
+  } else if(L.kind==="barred"){
+    html = head("bad","Too late to claim","The job ended more than 2 years ago, so claims are likely time barred (CF art. 7º, XXIX). We stopped before drafting, so this cost one cheap model call, not four.")+
+      `<div class="ctarow"><button class="btn" data-act="refer">Talk to a lawyer about exceptions</button></div><div id="actOut"></div>`;
+  } else if(L.kind==="missing"){
+    html = head("warn","We need a bit more before drafting",`The playbook needs: <b>${esc(L.missing.join(", ").replace(/_/g," "))}</b>.`)+
+      `<div class="ctarow"><button class="btn" data-act="addinfo">Add the missing details</button></div><div id="actOut"></div>`;
+  } else {
+    const best=L.best, s=L.bestScore, v=L.value||{total:0};
+    const summary = `<div class="score">
+      <div class="kpi"><div class="v">${s.overall}</div><div class="l">Quality score (${MODELS[L.winner].nick})</div></div>
+      <div class="kpi"><div class="v">${v.total?`${fmtR(v.total*.7)} to ${fmtR(v.total)}`:"to be calculated"}</div><div class="l">Estimated claim value</div></div>
+      <div class="kpi"><div class="v">${pb.deadlineDays} dias úteis</div><div class="l">Employer deadline to answer</div></div></div>`;
+    if(s.gate==="send"){
+      html = head("ok","Your notice is ready to send", s.reason)+summary+
+        `<details><summary>Final letter</summary><div class="letter" style="margin-top:8px">${esc(best.out.letter_pt)}</div></details>
+         <div class="ctarow"><button class="btn big" data-act="send">Send notice to employer</button><button class="btn ghost" data-act="lawyer">Ask a lawyer to check first</button><button class="btn ghost" data-act="copy">Copy letter</button></div><div id="actOut"></div>`;
+    } else if(s.gate==="review"){
+      html = head("warn","Almost there: a lawyer will check it", s.reason)+summary+
+        `<div class="ctarow"><button class="btn big" data-act="lawyer">Send to partner lawyer for approval</button><button class="btn ghost" data-act="addinfo">Add more evidence</button></div><div id="actOut"></div>`;
+    } else {
+      html = head("bad","We won't send this yet", s.reason+" The user gets a clear list of what is missing instead of a dead end.")+
+        `<p><b>What would make the case stronger:</b> ${esc((best.out.missing_evidence||[]).join("; ")||"more detail about what happened")}</p>
+         <div class="ctarow"><button class="btn big" data-act="addinfo">Add the missing information</button></div><div id="actOut"></div>`;
+    }
+  }
+  $("#doneOut").innerHTML = html;
+  document.querySelectorAll("#doneOut [data-act]").forEach(b=>b.onclick=()=>act(b.dataset.act,b));
+}
+function timeline(items){ return `<div class="tl">${items.map(([d,t,on])=>`<div class="tli ${on?"on":""}"><span>${d}</span><div>${t}</div></div>`).join("")}</div>`; }
+async function act(a, btn){
+  const out = $("#actOut"), pb = LAST.pbKey?PLAYBOOKS[LAST.pbKey]:null;
+  if(a==="send"){
+    document.querySelectorAll("#doneOut [data-act]").forEach(b=>b.disabled=true);
+    out.innerHTML = `<div class="gate ok" style="margin-top:12px">✓ Sent (simulated) to rh@empresa-exemplo.com.br · ${esc(LAST.id)}</div>
+      <h3 style="margin-top:14px">What happens next</h3>`+timeline([["Today","Notice sent. Delivery and open tracked.",true],[`Day ${pb.deadlineDays}`,"Deadline for the employer to answer. Reminder sent to the user.",false],["If they reply","Negotiation agent drafts a counter proposal within limits the user approves. Nothing is accepted automatically.",false],["If no reply","We help the user file at the Vara do Trabalho in their own name (CLT art. 791) or hand over to a partner lawyer.",false]]);
+    LAST.cta="sent"; logCta();
+  }
+  if(a==="lawyer"){
+    document.querySelectorAll("#doneOut [data-act]").forEach(b=>b.disabled=true);
+    out.innerHTML = `<div class="gate warn" style="margin-top:12px">✓ Sent to partner lawyer queue · ${esc(LAST.id)}</div>
+      <p class="note">The lawyer sees the draft, every citation check, the judge's notes and the facts, so review takes minutes, not hours.</p>`+
+      timeline([["Today","Review requested.",true],["Within 48h (target)","Lawyer approves, edits or rejects. Every edit is saved as training data for the playbook.",false],["After approval","Notice is sent. Same follow up as above.",false]]);
+    LAST.cta="lawyer"; logCta();
+  }
+  if(a==="copy"){ try{ await navigator.clipboard.writeText(LAST.best.out.letter_pt); btn.textContent="Copied"; }catch(e){ btn.textContent="Copy not allowed here"; } }
+  if(a==="addinfo"){
+    const qs = LAST.kind==="missing" ? LAST.missing.map(m=>m.replace(/_/g," ")) : (LAST.best?.out.missing_evidence||[]);
+    $("#caseText").value += "\n\nInformações adicionais: " + qs.map(q=>`${q}: ...`).join("; ");
+    $("#caseText").focus(); window.scrollTo({top:$("#caseText").getBoundingClientRect().top+scrollY-120, behavior:"smooth"});
+  }
+  if(a==="refer"){
+    out.innerHTML = `<p style="margin-top:12px">Suggested next step for the user: their union, the Defensoria Pública, or a labour lawyer. We log the case type so the product team can see which demands we turn away most often.</p>`;
+    LAST.cta="referred"; logCta();
+  }
+}
+
+/* ---------------- session log ---------------- */
+const LOG = [];
+function logCta(){ renderLog(); }
+function renderLog(){
+  if(!LOG.length){ $("#logOut").innerHTML=`<p class="note">No runs yet.</p>`; return; }
+  $("#logOut").innerHTML = `<table><tr><th>Case</th><th>Playbook</th><th>Outcome</th><th>Haiku</th><th>Sonnet</th><th>User action</th></tr>${
+    LOG.slice().reverse().map(r=>`<tr><td>${r.id}<div class="note">${r.time}</div></td><td>${r.pbKey?`Letter ${PLAYBOOKS[r.pbKey].n}`:"none"}</td><td>${r.kind==="full"?`<span class="pill ${GATE[r.bestScore.gate].cls}">${GATE[r.bestScore.gate].t}</span>`:`<span class="pill bad">${r.kind}</span>`}</td><td>${r.A?r.A.overall:"–"}</td><td>${r.B?r.B.overall:"–"}</td><td>${r.cta||"–"}</td></tr>`).join("")}</table>`;
+}
+function renderCompare(){
+  const runs = LOG.filter(r=>r.kind==="full"); if(!runs.length) return;
+  const agg = k => { const rows=runs.map(r=>r[k]); const avg=f=>Math.round(rows.reduce((a,r)=>a+r[f],0)/rows.length);
+    const ver = rows.reduce((a,r)=>a+r.claims.filter(c=>c.status==="verified").length,0)/Math.max(1,rows.reduce((a,r)=>a+r.claims.length,0));
+    return {ms:(rows.reduce((a,r)=>a+(r.ms||0),0)/rows.length/1000).toFixed(1), cost:(rows.reduce((a,r)=>a+(r.cost||0),0)/rows.length).toFixed(4), acc:avg("acc"),str:avg("str"),overall:avg("overall"),send:rows.filter(r=>r.gate==="send").length,hard:rows.filter(r=>r.hardFail).length,ver:Math.round(ver*100),wins:runs.filter(r=>r.winner===k).length}; };
+  const a=agg("A"), b=agg("B");
+  const funnelRuns = LOG.length, scoped = LOG.filter(r=>r.kind!=="scope").length, drafted = runs.length, sent = LOG.filter(r=>r.cta==="sent").length;
+  $("#cmp").innerHTML = `<table><tr><th></th><th>Model A · Haiku</th><th>Model B · Sonnet</th></tr>
+   <tr><td>Full runs</td><td>${runs.length}</td><td>${runs.length}</td></tr>
+   <tr><td>Exact quote rate</td><td>${a.ver}%</td><td>${b.ver}%</td></tr>
+   <tr><td>Avg citation accuracy</td><td>${a.acc}</td><td>${b.acc}</td></tr>
+   <tr><td>Avg citation strength</td><td>${a.str}</td><td>${b.str}</td></tr>
+   <tr><td>Avg overall</td><td><b>${a.overall}</b></td><td><b>${b.overall}</b></td></tr>
+   <tr><td>Passed gate (send)</td><td>${a.send}</td><td>${b.send}</td></tr>
+   <tr><td>Hard guardrail failures</td><td>${a.hard}</td><td>${b.hard}</td></tr>
+   <tr><td>Judge preferred</td><td>${a.wins}</td><td>${b.wins}</td></tr>
+   <tr><td>Avg draft time</td><td>${a.ms}s</td><td>${b.ms}s</td></tr>
+   <tr><td>Avg draft cost (est.)</td><td>$${a.cost}</td><td>$${b.cost}</td></tr></table>
+   <p class="note" style="margin-top:8px">Your live session funnel: ${funnelRuns} stories → ${scoped} in scope → ${drafted} drafted → ${sent} sent by the user.</p>
+   <p class="note">Decision rule I would use: ship the cheaper model wherever it passes the gate at the same rate, and keep the larger one for cases routed to review.</p>`;
+}
+
+/* ---------------- illustrative funnel ---------------- */
+(function(){
+  const F=[["Stories started",1000],["In scope (one of 4 playbooks)",780],["Intake completed",560],["Passed quality gate",450],["Notice sent",430],["Employer replied",260],["Settled",150]];
+  let h=""; F.forEach(([l,v],i)=>{ h+=`<div class="lvl"><div>${l}</div><div class="b" style="width:${v/10}%"></div><div><b>${v}</b></div></div>`;
+    if(i<F.length-1){ const d=Math.round((1-F[i+1][1]/v)*100); h+=`<div class="drop">−${d}%</div>`; } });
+  h+=`<p class="note">North star in this example: 150 ÷ 1000 = <b>15%</b> settled per story started.</p>`; $("#funnel").innerHTML=h;
+})();
+$("#corpusList").innerHTML = CORPUS.map(c=>`<div style="font-size:13px;margin:4px 0"><code>${c.id}</code> <a href="${c.url}">${esc(c.ref)}</a></div>`).join("");
+
+/* ---------------- main run ---------------- */
+async function run(){
+  const raw = $("#caseText").value.trim(); if(!raw) return;
+  hideAll(); $("#runBtn").disabled=true; $("#runNote").textContent="Running…"; let failed=false;
+  const id = caseId(), time = new Date().toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"});
+  try{
+    if(!sample) throw new Error("Live model calls are not available in this view.");
+    // 2. triage
+    setStep(2); show("#triageCard");
+    const red = redact(raw);
+    $("#triageOut").innerHTML = `<div class="stream">Reading the story…</div>`;
+    const tr = await callModel("X", triagePrompt(red.text));
+    const T = parseJSON(tr.text); const facts = T.facts||{}; FACTS = facts; PBKEY = T.playbook in PLAYBOOKS ? T.playbook : null;
+    const pb = PBKEY ? PLAYBOOKS[PBKEY] : null;
+    const monthsSince = facts.months_since_termination ?? (facts.days_since_termination!=null ? facts.days_since_termination/30 : null);
+    const pre = [
+      {k:"Personal data redacted before any model call", ok:true, d: red.n?`${red.n} item(s) replaced, e.g. CPF → [CPF]`:"Nothing to redact"},
+      {k:"In scope", ok:!!pb, d: pb?`Letter ${pb.n} · ${pb.en} (confidence ${Math.round((T.confidence||0)*100)}%)`:"Not an end of employment case"},
+      {k:"Within the 2 year limit", ok: !(monthsSince!=null && monthsSince>24), d: monthsSince!=null?`${Math.round(monthsSince)} months since the job ended`:"Not stated or still employed"},
+      {k:"Playbook's required facts present", ok: pb ? pb.requiredFacts.every(f=>facts[f]!==null && facts[f]!==undefined) : true, d: pb ? pb.requiredFacts.map(f=>`${f.replace(/_/g," ")}: ${facts[f]??"missing"}`).join(" · ") : "–"}
+    ];
+    $("#triageOut").innerHTML = `<p style="margin:0 0 8px">${esc(T.reason_en)} <span class="note">⏱ ${(tr.ms/1000).toFixed(1)}s · ~$${tr.cost.toFixed(4)}</span></p>
+      <table><tr><th>Pre check</th><th>Result</th><th>Detail</th></tr>${pre.map(c=>`<tr><td>${c.k}</td><td><span class="pill ${c.ok?"ok":"bad"}">${c.ok?"pass":"stop"}</span></td><td class="note">${esc(c.d)}</td></tr>`).join("")}</table>
+      ${red.n?`<details style="margin-top:8px"><summary>What the models see</summary><div class="letter" style="margin-top:6px">${esc(red.text)}</div></details>`:""}`;
+    setStep(2,true);
+    const base = {id,time,pbKey:PBKEY};
+    if(!pb){ LAST={...base,kind:"scope"}; LOG.push(LAST); renderLog(); setStep(8,true); renderDone(); return; }
+    if(!pre[2].ok){ LAST={...base,kind:"barred"}; LOG.push(LAST); renderLog(); setStep(8,true); renderDone(); return; }
+    if(!pre[3].ok){ LAST={...base,kind:"missing",missing:pb.requiredFacts.filter(f=>facts[f]===null||facts[f]===undefined)}; LOG.push(LAST); renderLog(); setStep(8,true); renderDone(); return; }
+
+    // 3. retrieve: mandatory + BM25
+    setStep(3); show("#retrCard");
+    const ranked = bm25(red.text + " " + pb.pt);
+    const mand = pb.requiredSources.map(i=>({c:CORPUS.find(c=>c.id===i), s:null, mandatory:true}));
+    const extra = ranked.filter(r=>r.s>0 && !pb.requiredSources.includes(r.c.id)).slice(0, 5-mand.length);
+    const retrieved = mand.concat(extra); const retrievedIds = new Set(retrieved.map(r=>r.c.id));
+    const top = Math.max(...extra.map(r=>r.s),1);
+    $("#retrList").innerHTML = retrieved.map(r=>`<div class="src"><div class="h"><b>${esc(r.c.id)} · ${esc(r.c.ref)}</b><span class="note">${r.mandatory?"mandatory for this playbook":"BM25 "+r.s.toFixed(2)}</span></div><div class="x">${esc(r.c.text)}</div>${r.c.note?`<div class="note" style="margin-top:4px">Note: ${esc(r.c.note)}</div>`:""}<div class="bar"><i style="width:${r.mandatory?100:Math.round(100*r.s/top)}%"></i></div></div>`).join("");
+    setStep(3,true);
+
+    // 4. drafts
+    setStep(4); show("#draftCard"); modelCard("A","running"); modelCard("B","running");
+    const prompt = draftPrompt(red.text, pb, retrieved, facts);
+    const go = async k => { try{ const r = await callModel(k, prompt, t=>{ const el=$("#st"+k); if(el) el.textContent=t.slice(-400); });
+        const d = {out:parseJSON(r.text), ...r}; modelCard(k,"done",d); return d; }
+      catch(e){ modelCard(k,"error", e.code==="not_granted"?"Permission not granted.":"Could not parse a valid answer ("+(e.message||e.code)+")."); throw e; } };
+    const [dA,dB] = await Promise.all([go("A"),go("B")]);
+    setStep(4,true);
+
+    // 5. guardrails + citations
+    setStep(5); show("#verifyCard");
+    const gA = guardrails(dA.out,pb,facts,retrievedIds), gB = guardrails(dB.out,pb,facts,retrievedIds);
+    const vA = verifyClaims(dA.out,retrievedIds), vB = verifyClaims(dB.out,retrievedIds);
+    const gt = (k,g,v)=>`<h3>${MODELS[k].label} · ${MODELS[k].nick} ${g.hardFail?'<span class="pill bad">hard fail</span>':'<span class="pill ok">no hard fails</span>'}</h3>
+      <table><tr><th>Guardrail</th><th></th><th>Detail</th></tr>${g.checks.map(c=>`<tr><td>${c.k} ${c.hard?'<span class="note">(hard)</span>':""}</td><td><span class="pill ${c.ok?"ok":c.hard?"bad":"warn"}">${c.ok?"pass":"fail"}</span></td><td class="note">${esc(c.d)}</td></tr>`).join("")}</table>
+      <table style="margin-top:10px"><tr><th>Claim</th><th>Source</th><th>Quote check</th></tr>${v.map(c=>`<tr><td>${esc(c.claim_pt)}<div class="note">“${esc(c.quote)}”</div></td><td><code>${esc(c.source_id)}</code></td><td><span class="pill ${STATUS_PILL[c.status]}">${c.status}</span><div class="note">${esc(c.why)}</div></td></tr>`).join("")||`<tr><td colspan="3" class="note">No legal claims made.</td></tr>`}</table>`;
+    $("#verifyOut").innerHTML = `<div class="grid2"><div>${gt("A",gA,vA)}</div><div>${gt("B",gB,vB)}</div></div>`;
+    setStep(5,true);
+
+    // 6. judge
+    setStep(6); show("#judgeCard"); $("#judgeOut").innerHTML = `<div class="stream" id="stC">Judge is reading both drafts…</div>`;
+    const order = Math.random()<.5?["A","B"]:["B","A"];
+    const drafts = order.map(k=>({k,out:(k==="A"?dA:dB).out}));
+    const jr = await callModel("C", judgePrompt(red.text,pb,retrieved,drafts), t=>{ const el=$("#stC"); if(el) el.textContent=t.slice(-400); });
+    const J = parseJSON(jr.text);
+    const jFor = k => (J.drafts||[]).find(d=>+d.draft===order.indexOf(k)+1)||{};
+    const jA=jFor("A"), jB=jFor("B"), prefKey = order[(+J.preferred||1)-1];
+    const jt=(k,j)=>`<h3>${MODELS[k].label} <span class="note">(Draft ${order.indexOf(k)+1} for the judge)</span></h3>
+      <p style="margin:0 0 6px"><span class="pill ${j.verdict==="send"?"ok":j.verdict==="refuse"?"bad":"warn"}">verdict: ${esc(j.verdict)}</span> ${j.overreach?'<span class="pill bad">overreach</span>':""}</p>
+      <p class="note" style="margin:0 0 8px">${esc(j.rationale_en)}</p>
+      <table><tr><th>#</th><th>Support</th><th>Strength</th><th>Note</th></tr>${(j.claims||[]).map(c=>`<tr><td>${c.i}</td><td>${c.support}/5</td><td>${c.strength}/5</td><td>${esc(c.note_en)}</td></tr>`).join("")}</table>
+      <p class="note">Clarity ${j.clarity}/5 · Tone ${j.tone}/5 · Actionability ${j.actionability}/5</p>`;
+    $("#judgeOut").innerHTML = `<p><b>Judge prefers ${MODELS[prefKey].label} (${MODELS[prefKey].nick}).</b> ${esc(J.why_en)} <span class="note">⏱ ${(jr.ms/1000).toFixed(1)}s</span></p><div class="grid2"><div>${jt("A",jA)}</div><div>${jt("B",jB)}</div></div>`;
+    setStep(6,true);
+
+    // 7. score + value + cost
+    setStep(7); show("#gateCard");
+    const sA = {...scoreDraft(vA,jA,gA), hardFail:gA.hardFail, ms:dA.ms, cost:dA.cost}, sB = {...scoreDraft(vB,jB,gB), hardFail:gB.hardFail, ms:dB.ms, cost:dB.cost};
+    const rank = s => (s.gate==="send"?2:s.gate==="review"?1:0)*1000 + s.overall;
+    const winner = rank(sA)===rank(sB) ? prefKey : (rank(sA)>rank(sB)?"A":"B");
+    const sc=(k,s)=>`<h3>${MODELS[k].label} · ${MODELS[k].nick} ${winner===k?'<span class="pill ok">best</span>':""}</h3>
+      <div class="score"><div class="kpi"><div class="v">${s.acc}</div><div class="l">Citation accuracy</div></div><div class="kpi"><div class="v">${s.str}</div><div class="l">Citation strength</div></div><div class="kpi"><div class="v">${s.qual}</div><div class="l">Letter quality</div></div><div class="kpi"><div class="v">${s.overall}</div><div class="l">Overall</div></div></div>
+      <div class="gate ${GATE[s.gate].cls}">${GATE[s.gate].t}<div style="font-weight:400;font-size:13px">${esc(s.reason)}</div></div>`;
+    $("#gateOut").innerHTML = `<div class="grid2"><div>${sc("A",sA)}</div><div>${sc("B",sB)}</div></div>`;
+    const value = renderValue();
+    const calls=[["Triage · Haiku",tr],["Model A · Haiku",dA],["Model B · Sonnet",dB],["Judge · Opus",jr]];
+    const tot=calls.reduce((a,[,c])=>a+c.cost,0), wall=tr.ms+Math.max(dA.ms,dB.ms)+jr.ms;
+    $("#costOut").innerHTML = `<table><tr><th>Call</th><th>Time</th><th>Tokens in / out (est.)</th><th>Cost (est.)</th></tr>${calls.map(([l,c])=>`<tr><td>${l}</td><td>${(c.ms/1000).toFixed(1)}s</td><td>${c.inTok} / ${c.outTok}</td><td>$${c.cost.toFixed(4)}</td></tr>`).join("")}<tr><td><b>Total</b></td><td><b>${(wall/1000).toFixed(1)}s</b></td><td></td><td><b>$${tot.toFixed(4)}</b></td></tr></table><p class="note">Prices are assumed list prices; tokens estimated at 4 characters each.</p>`;
+    setStep(7,true);
+
+    // 8. done
+    LAST = {...base, kind:"full", A:sA, B:sB, winner, best: winner==="A"?dA:dB, bestScore: winner==="A"?sA:sB, value};
+    LOG.push(LAST); renderLog(); renderCompare();
+    setStep(8,true); renderDone();
+    $("#doneCard").scrollIntoView({behavior:"smooth", block:"start"});
+  }catch(e){
+    console.log("[grapple-demo]", e);
+    if(String(e.message||"").includes("not available")) $("#noModels").classList.remove("hidden");
+    failed=true; $("#runNote").innerHTML = `<span class="err">${e.code==="rate_limited"?"Rate limited. Wait a minute and try again.":esc(e.message||e.code||"Something went wrong")}</span>`;
+  }finally{ $("#runBtn").disabled=false; if(!failed) $("#runNote").textContent = "Done. Scroll down for the result."; }
+}
+$("#runBtn").onclick = run;
+
+</script>
+</body>
+</html>
