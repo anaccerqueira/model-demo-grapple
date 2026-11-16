@@ -1,0 +1,57 @@
+{
+  "version": 1,
+  "sdk_version": "3.5.0",
+  "path": "/mcp",
+  "auth": {
+    "type": "oauth",
+    "issuer": "https://rrnzsuhoiyzahkeesqgk.supabase.co/auth/v1",
+    "accepted_audiences": [
+      "authenticated"
+    ]
+  },
+  "mcp": {
+    "server": {
+      "name": "ai-demo-gateway",
+      "version": "0.1.0",
+      "title": "AI Demo Gateway"
+    },
+    "tools": [
+      {
+        "name": "ask_claude",
+        "title": "Ask Claude",
+        "description": "Send a prompt to one of the demo's Claude models (haiku, sonnet or opus) and return its answer.",
+        "annotations": {
+          "readOnlyHint": true,
+          "openWorldHint": true
+        },
+        "inputSchema": {
+          "type": "object",
+          "properties": {
+            "prompt": {
+              "type": "string",
+              "minLength": 1,
+              "maxLength": 20000,
+              "description": "The prompt to send."
+            },
+            "model": {
+              "type": "string",
+              "enum": [
+                "claude-haiku-5-5",
+                "claude-sonnet-5-5",
+                "claude-opus-5-5"
+              ],
+              "default": "claude-sonnet-5-5",
+              "description": "Which demo model to use."
+            }
+          },
+          "required": [
+            "prompt"
+          ],
+          "additionalProperties": false,
+          "$schema": "http://json-schema.org/draft-07/schema#"
+        },
+        "outputSchema": null
+      }
+    ]
+  }
+}

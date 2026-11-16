@@ -28,3 +28,6 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+- Claude calls live in `src/lib/claude-gateway.ts`, shared by the demo's `/functions/v1/llm` route and the MCP `ask_claude` tool — one place for model mapping and Lovable AI streaming.
+- The MCP server (`src/lib/mcp/`) is OAuth-protected via Cloud Auth; consent at `/.lovable/oauth/consent`, sign-in at `/login?next=` — the tool spends AI credits, so callers must be signed in.
