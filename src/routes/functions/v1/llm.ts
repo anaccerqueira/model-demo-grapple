@@ -27,7 +27,7 @@ export const Route = createFileRoute("/functions/v1/llm")({
         const { prompt, model } = body;
         if (typeof prompt !== "string" || !prompt || prompt.length > MAX_PROMPT_CHARS) return json({ error: "Invalid prompt" }, 400);
         if (!model || !ALLOWED.includes(model)) return json({ error: "Model not allowed" }, 400);
-        const key = process.env.LOVABLE_API_KEY;
+        const key = process.env["LOVABLE_API_KEY"];
         if (!key) return json({ error: "AI is not configured" }, 500);
         const r = await fetch("https://ai.gateway.lovable.dev/v1/messages", {
           method: "POST",
