@@ -33,11 +33,17 @@ export const Route = createFileRoute("/functions/v1/llm")({
 });
 
 // Only signed-in users may spend the Anthropic key: verify the bearer with the auth service.
+// If DEMO_ALLOWED_EMAILS is set (comma-separated), only those accounts may call the models.
 async function isSignedIn(request: Request): Promise<boolean> {
   const token = request.headers.get("authorization")?.replace(/^Bearer\s+/i, "") ?? "";
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
   if (!token || token.startsWith("sb_") || !url || !key) return false;
   const res = await fetch(`${url}/auth/v1/user`, { headers: { apikey: key, Authorization: `Bearer ${token}` } });
-  return res.ok;
+  if (!res.ok) return false;
+  const allowed = (process.env["DEMO_ALLOWED_EMAILS"] ?? "")
+    .split(",").map((e) => e.trim().toLowerCase()).filter(Boolean);
+  if (!allowed.length) return true;
+  const user = (await res.json().catch(() => null)) as { email?: string } | null;
+  return !!user?.email && allowed.includes(user.email.toLowerCase());
 }

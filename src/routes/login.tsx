@@ -29,7 +29,7 @@ function Login() {
   const { t } = useLang();
   const { next } = Route.useSearch();
   const navigate = useNavigate();
-  const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
+  const [mode, setMode] = useState<"signin" | "forgot">("signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [msg, setMsg] = useState<string | null>(null);
@@ -63,13 +63,6 @@ function Login() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         goNext(next);
-      } else if (mode === "signup") {
-        const { error } = await supabase.auth.signUp({
-          email, password,
-          options: { emailRedirectTo: new URL(next, window.location.origin).href },
-        });
-        if (error) throw error;
-        setMsg(t("checkEmail"));
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
@@ -107,7 +100,7 @@ function Login() {
       <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6 text-card-foreground">
         <div className="flex items-start justify-between">
           <h1 className="text-xl font-semibold">
-            {mode === "signup" ? t("createAccount") : mode === "forgot" ? t("resetPassword") : t("signIn")}
+            {mode === "forgot" ? t("resetPassword") : t("signIn")}
           </h1>
           <LangToggle />
         </div>
@@ -126,12 +119,11 @@ function Login() {
           {err && <p role="alert" className="text-sm text-destructive">{err}</p>}
           {msg && <p className="text-sm text-muted-foreground">{msg}</p>}
           <Button type="submit" disabled={busy}>
-            {mode === "signup" ? t("signUp") : mode === "forgot" ? t("sendResetLink") : t("signIn")}
+            {mode === "forgot" ? t("sendResetLink") : t("signIn")}
           </Button>
         </form>
         <div className="mt-4 flex flex-col gap-1 text-sm">
           {mode === "signin" && <>
-            <button className="text-left text-primary underline-offset-4 hover:underline" onClick={() => setMode("signup")}>{t("noAccount")}</button>
             <button className="text-left text-muted-foreground underline-offset-4 hover:underline" onClick={() => setMode("forgot")}>{t("forgotPassword")}</button>
           </>}
           {mode !== "signin" && <button className="text-left text-primary underline-offset-4 hover:underline" onClick={() => setMode("signin")}>{t("backToSignIn")}</button>}
