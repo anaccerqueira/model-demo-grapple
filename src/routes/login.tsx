@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { oauthReturnPath } from "@/lib/oauth-return-path";
+import { LangToggle, useLang } from "@/lib/i18n";
 
 const NEXT_KEY = "auth_next";
 
@@ -13,10 +14,10 @@ export const Route = createFileRoute("/login")({
   validateSearch: (s: Record<string, unknown>) => ({ next: oauthReturnPath(s["next"]) }),
   head: () => ({
     meta: [
-      { title: "Sign in — AI Demo Gateway" },
-      { name: "description", content: "Sign in to connect assistants to AI Demo Gateway." },
-      { property: "og:title", content: "Sign in — AI Demo Gateway" },
-      { property: "og:description", content: "Sign in to connect assistants to AI Demo Gateway." },
+      { title: "Sign in — Peticiona" },
+      { name: "description", content: "Sign in to Peticiona." },
+      { property: "og:title", content: "Sign in — Peticiona" },
+      { property: "og:description", content: "Sign in to Peticiona." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],
@@ -25,6 +26,7 @@ export const Route = createFileRoute("/login")({
 });
 
 function Login() {
+  const { t } = useLang();
   const { next } = Route.useSearch();
   const navigate = useNavigate();
   const [mode, setMode] = useState<"signin" | "signup" | "forgot">("signin");
@@ -67,16 +69,16 @@ function Login() {
           options: { emailRedirectTo: new URL(next, window.location.origin).href },
         });
         if (error) throw error;
-        setMsg("Check your email to confirm your account.");
+        setMsg(t("checkEmail"));
       } else {
         const { error } = await supabase.auth.resetPasswordForEmail(email, {
           redirectTo: `${window.location.origin}/reset-password`,
         });
         if (error) throw error;
-        setMsg("If that email has an account, a reset link is on its way.");
+        setMsg(t("resetSent"));
       }
     } catch (e) {
-      setErr(e instanceof Error ? e.message : "Something went wrong");
+      setErr(e instanceof Error ? e.message : t("somethingWrong"));
     } finally {
       setBusy(false);
     }
@@ -86,11 +88,14 @@ function Login() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-background p-6">
         <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6 text-card-foreground">
-          <h1 className="text-xl font-semibold">You're signed in</h1>
-          <p className="mt-2 text-sm text-muted-foreground">Signed in as {signedIn}.</p>
+          <div className="flex items-start justify-between">
+            <h1 className="text-xl font-semibold">{t("youreSignedIn")}</h1>
+            <LangToggle />
+          </div>
+          <p className="mt-2 text-sm text-muted-foreground">{t("signedInAs", { email: signedIn })}</p>
           <div className="mt-6 flex gap-2">
-            <Button onClick={() => window.location.assign("/demo.html")}>Open demo</Button>
-            <Button variant="outline" onClick={async () => { await supabase.auth.signOut(); setSignedIn(null); }}>Sign out</Button>
+            <Button onClick={() => window.location.assign("/demo.html")}>{t("openDemo")}</Button>
+            <Button variant="outline" onClick={async () => { await supabase.auth.signOut(); setSignedIn(null); }}>{t("signOut")}</Button>
           </div>
         </div>
       </main>
@@ -100,33 +105,36 @@ function Login() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-background p-6">
       <div className="w-full max-w-sm rounded-lg border border-border bg-card p-6 text-card-foreground">
-        <h1 className="text-xl font-semibold">
-          {mode === "signup" ? "Create an account" : mode === "forgot" ? "Reset your password" : "Sign in"}
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">AI Demo</p>
+        <div className="flex items-start justify-between">
+          <h1 className="text-xl font-semibold">
+            {mode === "signup" ? t("createAccount") : mode === "forgot" ? t("resetPassword") : t("signIn")}
+          </h1>
+          <LangToggle />
+        </div>
+        <p className="mt-1 text-sm text-muted-foreground">Peticiona</p>
         <form onSubmit={submit} className="mt-6 grid gap-3">
           <div className="grid gap-1.5">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{t("email")}</Label>
             <Input id="email" type="email" required value={email} onChange={(e) => setEmail(e.target.value)} />
           </div>
           {mode !== "forgot" && (
             <div className="grid gap-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("password")}</Label>
               <Input id="password" type="password" required minLength={6} value={password} onChange={(e) => setPassword(e.target.value)} />
             </div>
           )}
           {err && <p role="alert" className="text-sm text-destructive">{err}</p>}
           {msg && <p className="text-sm text-muted-foreground">{msg}</p>}
           <Button type="submit" disabled={busy}>
-            {mode === "signup" ? "Sign up" : mode === "forgot" ? "Send reset link" : "Sign in"}
+            {mode === "signup" ? t("signUp") : mode === "forgot" ? t("sendResetLink") : t("signIn")}
           </Button>
         </form>
         <div className="mt-4 flex flex-col gap-1 text-sm">
           {mode === "signin" && <>
-            <button className="text-left text-primary underline-offset-4 hover:underline" onClick={() => setMode("signup")}>No account? Sign up</button>
-            <button className="text-left text-muted-foreground underline-offset-4 hover:underline" onClick={() => setMode("forgot")}>Forgot password?</button>
+            <button className="text-left text-primary underline-offset-4 hover:underline" onClick={() => setMode("signup")}>{t("noAccount")}</button>
+            <button className="text-left text-muted-foreground underline-offset-4 hover:underline" onClick={() => setMode("forgot")}>{t("forgotPassword")}</button>
           </>}
-          {mode !== "signin" && <button className="text-left text-primary underline-offset-4 hover:underline" onClick={() => setMode("signin")}>Back to sign in</button>}
+          {mode !== "signin" && <button className="text-left text-primary underline-offset-4 hover:underline" onClick={() => setMode("signin")}>{t("backToSignIn")}</button>}
         </div>
       </div>
     </main>

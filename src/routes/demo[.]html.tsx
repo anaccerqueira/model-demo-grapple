@@ -1,6 +1,7 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { LangToggle, useLang } from "@/lib/i18n";
 import demoHtml from "@/assets/demo.html?raw";
 
 // The demo page is shown only to signed-in users; its model calls carry the user's session.
@@ -31,6 +32,7 @@ export const Route = createFileRoute("/demo.html")({
 });
 
 function Demo() {
+  const { t } = useLang();
   const { email } = Route.useRouteContext();
   const [out, setOut] = useState(false);
   const srcDoc = useMemo(() => demoHtml.replace(/<head>/i, "<head>" + BRIDGE), []);
@@ -50,9 +52,13 @@ function Demo() {
 
   return (
     <div className="flex h-screen flex-col bg-background">
-      <div className="flex items-center justify-end gap-3 border-b border-border px-4 py-1.5 text-xs text-muted-foreground">
-        <span>{email}</span>
-        <button onClick={signOut} disabled={out} className="text-primary underline-offset-4 hover:underline">Sign out</button>
+      <div className="flex items-center justify-between gap-3 border-b border-border px-4 py-1.5 text-xs text-muted-foreground">
+        <span className="font-semibold text-foreground">Peticiona</span>
+        <div className="flex items-center gap-3">
+          <LangToggle />
+          <span>{email}</span>
+          <button onClick={signOut} disabled={out} className="text-primary underline-offset-4 hover:underline">{t("signOut")}</button>
+        </div>
       </div>
       <iframe title="Demo" srcDoc={srcDoc} className="w-full flex-1 border-0" />
     </div>
