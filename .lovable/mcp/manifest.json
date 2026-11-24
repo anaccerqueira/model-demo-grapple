@@ -11,9 +11,9 @@
   },
   "mcp": {
     "server": {
-      "name": "ai-demo-gateway",
+      "name": "peticiona",
       "version": "0.1.0",
-      "title": "AI Demo Gateway"
+      "title": "Peticiona"
     },
     "tools": [
       {
