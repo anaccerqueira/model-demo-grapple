@@ -7,10 +7,10 @@ export const Route = createFileRoute("/demo")({
   },
   head: () => ({
     meta: [
-      { title: "Grapple BR demo" },
-      { name: "description", content: "Short link to the Grapple BR AI case workflow demo." },
-      { property: "og:title", content: "Grapple BR demo" },
-      { property: "og:description", content: "Short link to the Grapple BR AI case workflow demo." },
+      { title: "Peticiona demo" },
+      { name: "description", content: "Short link to the Peticiona AI case workflow demo." },
+      { property: "og:title", content: "Peticiona demo" },
+      { property: "og:description", content: "Short link to the Peticiona AI case workflow demo." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
     ],

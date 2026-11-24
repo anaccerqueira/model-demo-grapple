@@ -1,5 +1,5 @@
 import { createFileRoute, redirect } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { LangToggle, useLang } from "@/lib/i18n";
 import demoHtml from "@/assets/demo.html?raw";
@@ -20,9 +20,9 @@ export const Route = createFileRoute("/demo.html")({
   },
   head: () => ({
     meta: [
-      { title: "Grapple BR · AI case workflow demo" },
+      { title: "Peticiona · AI case workflow demo" },
       { name: "description", content: "Interactive AI case workflow demo for signed-in users." },
-      { property: "og:title", content: "Grapple BR · AI case workflow demo" },
+      { property: "og:title", content: "Peticiona · AI case workflow demo" },
       { property: "og:description", content: "Interactive AI case workflow demo for signed-in users." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -32,7 +32,8 @@ export const Route = createFileRoute("/demo.html")({
 });
 
 function Demo() {
-  const { t } = useLang();
+  const { t, lang } = useLang();
+  const frame = useRef<HTMLIFrameElement>(null);
   const { email } = Route.useRouteContext();
   const [out, setOut] = useState(false);
   const srcDoc = useMemo(() => demoHtml.replace(/<head>/i, "<head>" + BRIDGE), []);
@@ -44,6 +45,10 @@ function Demo() {
     });
     return () => data.subscription.unsubscribe();
   }, []);
+
+  // Keep the demo's language in sync with the top bar toggle.
+  const sendLang = () => frame.current?.contentWindow?.postMessage({ type: "peticiona-lang", lang }, "*");
+  useEffect(sendLang, [lang]);
 
   async function signOut() {
     setOut(true);
@@ -60,7 +65,7 @@ function Demo() {
           <button onClick={signOut} disabled={out} className="text-primary underline-offset-4 hover:underline">{t("signOut")}</button>
         </div>
       </div>
-      <iframe title="Demo" srcDoc={srcDoc} className="w-full flex-1 border-0" />
+      <iframe ref={frame} onLoad={sendLang} title="Demo" srcDoc={srcDoc} className="w-full flex-1 border-0" />
     </div>
   );
 }

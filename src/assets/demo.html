@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Grapple BR · AI case workflow demo</title>
+<title>Peticiona · AI case workflow demo</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,500;9..144,700&display=swap" rel="stylesheet">
 <style>
@@ -102,7 +102,7 @@ code{font-family:var(--mono);font-size:12.5px;background:#f1efe8;padding:1px 5px
 <header>
   <div class="wrap">
     <div class="eyebrow">Product sample · built by Ana Cerqueira</div>
-    <h1>Grapple, localised for Brazil: an end to end AI case workflow</h1>
+    <h1>Peticiona: an end to end AI workflow for Brazilian labour claims</h1>
     <p>Real retrieval over Brazilian labour law, two models drafting in parallel, a third model judging blind, a citation score, a quality gate that can refuse to send, and the funnel I would run the product on.</p>
     <nav id="nav">
       <button data-v="workflow" class="on">1 · Live workflow</button>
@@ -202,10 +202,10 @@ code{font-family:var(--mono);font-size:12.5px;background:#f1efe8;padding:1px 5px
 
 <!-- ============ FUNNEL ============ -->
 <section class="view" id="v-funnel">
-  <h2>The metrics I would run Grapple on</h2>
+  <h2>The metrics I would run Peticiona on</h2>
   <p class="sub">On a pay on success model, every case that stalls is lost revenue. So the north star is settlements per case started, not letters sent.</p>
 
-  <div class="banner">The funnel below uses <b>illustrative numbers</b> to show the structure of the dashboard. They are not real Grapple or Brazil data. The model comparison further down is live, built from the runs on tab 1.</div>
+  <div class="banner">The funnel below uses <b>illustrative numbers</b> to show the structure of the dashboard. They are not real data. The model comparison further down is live, built from the runs on tab 1.</div>
 
   <div class="cols3">
     <div class="card"><div class="l note">North star</div><div style="font:700 28px Fraunces,serif">Settled ÷ started</div><div class="note">Captures intake, quality and negotiation in one number.</div></div>
@@ -296,7 +296,7 @@ code{font-family:var(--mono);font-size:12.5px;background:#f1efe8;padding:1px 5px
   <div class="card">
     <h3>Benchmark</h3>
     <table>
-      <tr><th>Player</th><th>Model</th><th>What happened</th><th>Lesson for Grapple BR</th></tr>
+      <tr><th>Player</th><th>Model</th><th>What happened</th><th>Lesson for Peticiona</th></tr>
       <tr><td><b>Grapple</b><div class="note">UK</div></td><td>AI only, no lawyers, success fee. Sends letters, values claims.</td><td>Working because legal letters and advice are not reserved activities in the UK. Respondent lawyers are already pushing back on AI drafted claims.</td><td><span class="pill warn">Does not copy directly</span> The UK legal basis does not exist in Brazil.</td></tr>
       <tr><td><b>Contend</b><div class="note">UK</div></td><td>AI interface to draft legal letters and claims.</td><td>Direct competitor in the same space.</td><td>Quality and trust, not drafting, is the differentiator.</td></tr>
       <tr><td><b>Garfield</b><div class="note">UK</div></td><td>AI litigation assistant for SME debt claims up to £10,000.</td><td>Authorised by the SRA in May 2025 as the first regulated AI law firm.</td><td><span class="pill ok">Path exists</span> Working with the regulator beats working around it.</td></tr>
@@ -311,7 +311,7 @@ code{font-family:var(--mono);font-size:12.5px;background:#f1efe8;padding:1px 5px
     <div class="card">
       <h3><span class="pill ok">Could work</span></h3>
       <ul class="tight">
-        <li><b>Lawyer in the loop:</b> Grapple's intake, triage, drafting and quality gate, with a partner labour lawyer who advises and signs. Mirrors Grapple's own structure inside Monaco Solicitors.</li>
+        <li><b>Lawyer in the loop:</b> Peticiona's intake, triage, drafting and quality gate, with a partner labour lawyer who advises and signs. Mirrors how Grapple sits inside Monaco Solicitors in the UK.</li>
         <li><b>B2B tool for labour law firms:</b> with 3.6 million new cases a year, productivity for lawyers is a big market and avoids the OAB conflict.</li>
         <li><b>Free information and calculators</b> (rights, deadlines, claim value) as top of funnel, handing off to lawyers.</li>
       </ul>
@@ -377,7 +377,7 @@ code{font-family:var(--mono);font-size:12.5px;background:#f1efe8;padding:1px 5px
         <li><b>Code before AI for facts.</b> Whether a quote exists in a source is checked by string matching, not by a model. Models only judge things that need judgement.</li>
         <li><b>Two models, one judge.</b> Lets us pick the cheapest model that passes the gate, and spot regressions when prompts or models change.</li>
         <li><b>Blind, shuffled judging</b> to reduce self preference and position bias.</li>
-        <li><b>Refusal is a feature.</b> Grapple's promise is that it will not send a weak letter. The gate makes that measurable.</li>
+        <li><b>Refusal is a feature.</b> Peticiona's promise is that it will not send a weak letter. The gate makes that measurable.</li>
         <li><b>Style guard.</b> Drafts are told to avoid typical AI tells (like em dashes) that opposing lawyers already flag.</li>
       </ul>
     </div>
@@ -401,6 +401,265 @@ code{font-family:var(--mono);font-size:12.5px;background:#f1efe8;padding:1px 5px
 </main>
 
 <script>
+/* ---------------- i18n: PT / EN (PT is the default; synced with the app's top bar toggle) ---------------- */
+const PT = {
+ "Product sample · built by Ana Cerqueira":"Protótipo de produto · criado por Ana Cerqueira",
+ "Peticiona: an end to end AI workflow for Brazilian labour claims":"Peticiona: um fluxo de IA de ponta a ponta para causas trabalhistas no Brasil",
+ "Real retrieval over Brazilian labour law, two models drafting in parallel, a third model judging blind, a citation score, a quality gate that can refuse to send, and the funnel I would run the product on.":"Busca real na legislação trabalhista brasileira, dois modelos redigindo em paralelo, um terceiro modelo avaliando às cegas, uma nota de citação, um filtro de qualidade que pode recusar o envio e o funil com que eu gerenciaria o produto.",
+ "1 · Live workflow":"1 · Fluxo ao vivo","2 · Product metrics":"2 · Métricas de produto","3 · Brazil expansion":"3 · Expansão no Brasil","4 · Market benchmark":"4 · Benchmark de mercado","5 · How it works":"5 · Como funciona",
+ "Model calls are not configured yet.":"As chamadas aos modelos ainda não estão configuradas.",
+ "Scope: one niche, done well":"Escopo: um nicho, bem feito",
+ "This pilot only handles":"Este piloto atende apenas","end of employment disputes":"conflitos de fim de contrato de trabalho",
+ "in Brazil. Every story is routed to one of four lawyer style playbooks. Anything else is politely turned away instead of guessed at.":"no Brasil. Cada relato é direcionado a um de quatro playbooks no estilo de um advogado. Todo o resto é recusado com educação, em vez de virar chute.",
+ "Late severance pay":"Verbas rescisórias atrasadas","Dismissed, and severance or exit documents not delivered within 10 days":"Demitido, e as verbas ou os documentos da rescisão não foram entregues em 10 dias",
+ "Leave without losing rights":"Sair sem perder direitos","Still employed, employer breaks core obligations (FGTS not deposited, salary late)":"Ainda empregado, e o empregador descumpre obrigações básicas (FGTS não depositado, salário atrasado)",
+ "Dismissed while pregnant":"Demitida durante a gravidez","Dismissed without just cause while pregnant, even if the employer did not know":"Demitida sem justa causa durante a gravidez, mesmo que o empregador não soubesse",
+ "Unpaid overtime at exit":"Horas extras não pagas na saída","Worked beyond normal hours without overtime pay":"Trabalhou além da jornada normal sem receber hora extra",
+ "Story":"Relato","Triage":"Triagem","Retrieve":"Busca","Draft A vs B":"Rascunho A vs B","Guardrails":"Guardrails","Judge":"Juiz","Score + value":"Nota + valor","Done":"Fim",
+ "1. The worker tells their story":"1. O trabalhador conta o que aconteceu",
+ "In the real product this is the only thing the user does: describe what happened in their own words. The examples below just fill the box for the demo. You can edit them or write a new story.":"No produto real, essa é a única coisa que o usuário faz: descrever o que aconteceu com as próprias palavras. Os exemplos abaixo só preenchem a caixa para a demo. Você pode editá-los ou escrever um relato novo.",
+ "Playbook 1 · includes a CPF to show redaction":"Playbook 1 · inclui um CPF para mostrar a anonimização",
+ "FGTS not deposited":"FGTS não depositado","Playbook 2 · still employed":"Playbook 2 · ainda empregado",
+ "Playbook 3 · employer says it did not know":"Playbook 3 · a empresa diz que não sabia",
+ "Unpaid overtime":"Horas extras não pagas","Playbook 4 · no time clock":"Playbook 4 · sem controle de ponto",
+ "Time barred":"Prescrito","Pre check stops it before drafting":"A pré-checagem para antes da redação",
+ "Out of scope":"Fora do escopo","Not an employment exit case":"Não é um caso de fim de contrato",
+ "Worker's story":"Relato do trabalhador","(Portuguese, as a real user would write it)":"(em português, como um usuário real escreveria)",
+ "Run the workflow":"Rodar o fluxo","About 30 to 60 seconds. Four real model calls.":"Leva de 30 a 60 segundos. Quatro chamadas reais a modelos.",
+ "Running…":"Rodando…","Done. Scroll down for the result.":"Pronto. Role para baixo para ver o resultado.",
+ "2. Triage: route, redact, pre check":"2. Triagem: direcionar, anonimizar, pré-checar",
+ "A small, cheap model reads the story once: which playbook it belongs to and the key facts. Then code runs the checks that should never depend on a model.":"Um modelo pequeno e barato lê o relato uma vez: a qual playbook ele pertence e quais são os fatos principais. Depois, o código roda as checagens que nunca deveriam depender de um modelo.",
+ "3. Retrieved sources":"3. Fontes encontradas",
+ "The playbook's mandatory sources always come first, then BM25 keyword retrieval adds related provisions. Only these reach the drafting models.":"As fontes obrigatórias do playbook sempre vêm primeiro, e a busca por palavras-chave (BM25) acrescenta dispositivos relacionados. Só elas chegam aos modelos que redigem.",
+ "4. Two models fill the playbook":"4. Dois modelos preenchem o playbook",
+ "Same playbook, same sources, different models. The models do not invent the letter's structure: they fill a lawyer approved skeleton with the worker's facts.":"Mesmo playbook, mesmas fontes, modelos diferentes. Os modelos não inventam a estrutura da carta: preenchem um esqueleto aprovado por advogado com os fatos do trabalhador.",
+ "5. Guardrails, checked by code":"5. Guardrails, checados por código",
+ "No AI here. Hard failures block sending; soft ones lower the score.":"Aqui não tem IA. Falhas graves bloqueiam o envio; as leves reduzem a nota.",
+ "6. Model C judges both drafts, blind":"6. O modelo C avalia os dois rascunhos às cegas",
+ "The judge does not know which model wrote which draft, and the order is shuffled to avoid position bias.":"O juiz não sabe qual modelo escreveu cada rascunho, e a ordem é sorteada para evitar viés de posição.",
+ "7. Score, gate and claim value":"7. Nota, filtro e valor da causa",
+ "Overall = 50% citation accuracy + 30% citation strength + 20% letter quality, minus 15 for overreach. Any hard guardrail failure blocks sending.":"Nota geral = 50% precisão das citações + 30% força das citações + 20% qualidade da carta, menos 15 por exagero. Qualquer falha grave de guardrail bloqueia o envio.",
+ "Estimated claim value":"Valor estimado da causa",
+ "Facts come from triage; the money is calculated by code with visible formulas. Edit the salary to recalculate.":"Os fatos vêm da triagem; o valor é calculado por código com fórmulas visíveis. Edite o salário para recalcular.",
+ "Time and cost of this run":"Tempo e custo desta execução",
+ "Runs this session":"Execuções nesta sessão","live data":"dados reais",
+ "Every run is logged here, so the model comparison in tab 2 is built from real results.":"Cada execução fica registrada aqui, então a comparação de modelos na aba 2 é feita com resultados reais.",
+ "No runs yet.":"Nenhuma execução ainda.",
+ "The metrics I would run Peticiona on":"As métricas com que eu gerenciaria a Peticiona",
+ "On a pay on success model, every case that stalls is lost revenue. So the north star is settlements per case started, not letters sent.":"Num modelo de cobrança por êxito, cada caso que trava é receita perdida. Por isso a métrica norte é acordos por caso iniciado, e não cartas enviadas.",
+ "The funnel below uses":"O funil abaixo usa","illustrative numbers":"números ilustrativos",
+ "to show the structure of the dashboard. They are not real data. The model comparison further down is live, built from the runs on tab 1.":"para mostrar a estrutura do painel. Não são dados reais. A comparação de modelos mais abaixo é ao vivo, feita com as execuções da aba 1.",
+ "North star":"Métrica norte","Settled ÷ started":"Acordos ÷ iniciados","Captures intake, quality and negotiation in one number.":"Resume entrada, qualidade e negociação num só número.",
+ "Guardrail":"Guardrail","0 hallucinations sent":"0 alucinações enviadas","Measured by the deterministic check on every outgoing letter.":"Medido pela checagem determinística em cada carta enviada.",
+ "Efficiency":"Eficiência","Cost per settled case":"Custo por caso com acordo","Model spend plus human review time, against recovered value.":"Gasto com modelos mais tempo de revisão humana, comparado ao valor recuperado.",
+ "Case funnel":"Funil de casos","illustrative":"ilustrativo","Stories started":"Relatos iniciados","In scope (one of 4 playbooks)":"No escopo (um dos 4 playbooks)","Intake completed":"Cadastro concluído","Passed quality gate":"Passou no filtro de qualidade","Notice sent":"Notificação enviada","Employer replied":"Empresa respondeu","Settled":"Acordo fechado",
+ "North star in this example: 150 ÷ 1000 =":"Métrica norte neste exemplo: 150 ÷ 1000 =","settled per story started.":"de acordos por relato iniciado.",
+ "Where I would look first: the biggest drop is intake. Bets: show an estimated claim value after 3 questions and ask for documents later; save progress so users can come back; for refused cases, say exactly what evidence would make the case stronger instead of a dead end.":"Onde eu olharia primeiro: a maior queda está no cadastro. Apostas: mostrar o valor estimado da causa depois de 3 perguntas e pedir os documentos depois; salvar o progresso para o usuário poder voltar; nos casos recusados, dizer exatamente que prova fortaleceria o caso, em vez de um beco sem saída.",
+ "Model A vs Model B":"Modelo A vs Modelo B","live from your runs":"ao vivo, das suas execuções","Run the workflow on tab 1 to fill this table.":"Rode o fluxo na aba 1 para preencher esta tabela.",
+ "Weekly scorecard I would review":"Painel semanal que eu revisaria","Metric":"Métrica","Why it matters":"Por que importa","Source":"Fonte",
+ "Intake completion rate":"Taxa de conclusão do cadastro","Largest drop in most self serve legal flows":"A maior queda na maioria dos fluxos jurídicos de autoatendimento","Product analytics":"Analytics do produto",
+ "Gate outcome split (send / review / refuse)":"Divisão dos resultados do filtro (enviar / revisar / recusar)","Too many refusals hurts growth, too few hurts trust":"Recusas demais prejudicam o crescimento; de menos, a confiança","Workflow logs":"Logs do fluxo",
+ "Citation accuracy, per model":"Precisão das citações, por modelo","Picks the model and catches regressions after prompt changes":"Escolhe o modelo e pega regressões depois de mudanças no prompt","Step 4 + judge":"Etapa 4 + juiz",
+ "Human review agreement with judge":"Concordância da revisão humana com o juiz","Tells us when the judge can be trusted alone":"Mostra quando dá para confiar no juiz sozinho","Weekly lawyer sample":"Amostra semanal revisada por advogado",
+ "Reply rate and time to reply":"Taxa e tempo de resposta","Is the letter credible to employers?":"A carta é crível para as empresas?","Email events":"Eventos de e-mail",
+ "Settlement rate and median value":"Taxa de acordo e valor mediano","Revenue on a success fee model":"Receita num modelo de cobrança por êxito","Case outcomes":"Resultados dos casos",
+ "Why Brazil, and what has to change":"Por que o Brasil, e o que precisa mudar",
+ "The UK model works partly because sending legal letters and advising on rights are not reserved activities. Brazil is different, so the product has to adapt before it can launch.":"O modelo do Reino Unido funciona em parte porque enviar cartas jurídicas e orientar sobre direitos não são atividades privativas de advogado. No Brasil é diferente, então o produto precisa se adaptar antes de lançar.",
+ "The constraint":"A restrição","The OAB statute makes legal consultancy and advice an activity exclusive to lawyers (":"O Estatuto da OAB torna a consultoria e a assessoria jurídica atividades privativas de advogado (",
+ "). A pure \"no lawyers\" product that advises workers would face regulatory risk.":"). Um produto \"sem advogados\" que orienta trabalhadores enfrentaria risco regulatório.",
+ "The opening":"A brecha","In labour courts, workers can file and follow their own claims without a lawyer (":"Na Justiça do Trabalho, o trabalhador pode entrar com a ação e acompanhá-la sem advogado (",
+ ", CLT art. 791), at first instance and regional courts (TST Súmula 425). So a tool that helps a worker organise facts, check the law and act in their own name has a real foothold.":", CLT art. 791), nas Varas e nos Tribunais Regionais (TST Súmula 425). Então uma ferramenta que ajuda o trabalhador a organizar os fatos, conferir a lei e agir em nome próprio tem espaço real.",
+ "Proposed model for a Brazil pilot":"Modelo proposto para um piloto no Brasil",
+ "Self serve layer:":"Camada de autoatendimento:","the worker builds their case, sees the relevant law with verified citations, and sends a notice in their own name.":"o trabalhador monta o caso, vê a lei aplicável com citações verificadas e envia uma notificação em nome próprio.",
+ "Partner lawyer layer:":"Camada de advogados parceiros:","anything that is advice, or any case the gate sends to review, goes to an OAB registered partner lawyer who reviews and signs.":"tudo que for orientação jurídica, ou qualquer caso que o filtro mande para revisão, vai para um advogado parceiro inscrito na OAB, que revisa e assina.",
+ "Business model to validate with counsel:":"Modelo de negócio a validar com um advogado:","fee structures between a tech company and lawyers have specific ethics rules in Brazil, so this needs legal review before launch.":"a remuneração entre uma empresa de tecnologia e advogados tem regras éticas específicas no Brasil, então isso precisa de revisão jurídica antes do lançamento.",
+ "Pilot scope:":"Escopo do piloto:","3 claim types with clear statutory rules (unpaid overtime, late severance, pregnancy dismissal), one state.":"3 tipos de causa com regras legais claras (horas extras, verbas rescisórias atrasadas, demissão de gestante), em um estado.",
+ "Same workflow, UK version":"O mesmo fluxo, versão Reino Unido",
+ "Nothing in the pipeline is Brazil specific except the corpus and the value formulas. For the UK, swap in the Employment Rights Act provisions (including the 6 month qualifying period from January 2027), Acas early conciliation and tribunal time limits, and keep the verifier, judge, gate and funnel as they are.":"Nada no fluxo é específico do Brasil, exceto o corpus e as fórmulas de valor. Para o Reino Unido, basta trocar pelas regras do Employment Rights Act (incluindo o período mínimo de 6 meses a partir de janeiro de 2027), pela conciliação prévia da Acas e pelos prazos do tribunal, mantendo o verificador, o juiz, o filtro e o funil como estão.",
+ "Roadmap":"Roadmap","Now (this demo)":"Agora (esta demo)","Next":"Próximo","Later":"Depois",
+ "RAG over curated statutes, two model drafting, blind judge, citation score, quality gate, funnel":"RAG sobre leis selecionadas, redação com dois modelos, juiz às cegas, nota de citação, filtro de qualidade, funil",
+ "Negotiation agent:":"Agente de negociação:","reads the employer reply, proposes a counter offer within bounds the user approved, never accepts on its own.":"lê a resposta da empresa, propõe uma contraproposta dentro dos limites que o usuário aprovou, e nunca aceita nada sozinho.",
+ "Labelled eval set of 200 cases reviewed by lawyers":"Conjunto de avaliação com 200 casos rotulados por advogados",
+ "Embedding retrieval with automatic updates when law or case law changes":"Busca por embeddings com atualização automática quando a lei ou a jurisprudência mudar",
+ "Settlement value prediction from outcomes data":"Previsão do valor de acordo com base nos resultados",
+ "Market benchmark: what could and could not work in Brazil":"Benchmark de mercado: o que pode e o que não pode funcionar no Brasil",
+ "Similar products in the UK, US and Brazil, what happened to them, and what that means for a Brazilian launch.":"Produtos parecidos no Reino Unido, nos EUA e no Brasil, o que aconteceu com eles e o que isso significa para um lançamento no Brasil.",
+ "New labour lawsuits in Brazil, 2024":"Novas ações trabalhistas no Brasil, 2024","3.6 million":"3,6 milhões",
+ "Main regulatory risk":"Principal risco regulatório","OAB: advice is for lawyers only":"OAB: orientação jurídica só por advogado",
+ "Lei 8.906/94, art. 1º, II, and active lawsuits against legaltechs":"Lei 8.906/94, art. 1º, II, e processos em andamento contra legaltechs",
+ "Main opening":"Principal brecha","Workers can file alone":"O trabalhador pode entrar sozinho","CLT art. 791, first instance and regional courts":"CLT art. 791, nas Varas e nos Tribunais Regionais",
+ "Benchmark":"Benchmark","Player":"Empresa","Model":"Modelo","What happened":"O que aconteceu","Lesson for Peticiona":"Lição para a Peticiona",
+ "UK":"Reino Unido","AI only, no lawyers, success fee. Sends letters, values claims.":"Só IA, sem advogados, cobrança por êxito. Envia cartas e estima o valor da causa.",
+ "Working because legal letters and advice are not reserved activities in the UK. Respondent lawyers are already pushing back on AI drafted claims.":"Funciona porque cartas jurídicas e orientação não são atividades privativas no Reino Unido. Advogados das empresas já estão reagindo às ações redigidas por IA.",
+ "Does not copy directly":"Não dá para copiar direto","The UK legal basis does not exist in Brazil.":"A base legal do Reino Unido não existe no Brasil.",
+ "AI interface to draft legal letters and claims.":"Interface de IA para redigir cartas e ações.","Direct competitor in the same space.":"Concorrente direto no mesmo espaço.","Quality and trust, not drafting, is the differentiator.":"O diferencial é qualidade e confiança, não a redação.",
+ "AI litigation assistant for SME debt claims up to £10,000.":"Assistente de IA para cobranças judiciais de PMEs de até £10.000.","Authorised by the SRA in May 2025 as the first regulated AI law firm.":"Autorizado pela SRA em maio de 2025 como o primeiro escritório de IA regulamentado.",
+ "Path exists":"Existe caminho","Working with the regulator beats working around it.":"Trabalhar com o regulador é melhor do que contorná-lo.",
+ "US":"EUA","Marketed as \"the world's first robot lawyer\".":"Divulgado como \"o primeiro advogado robô do mundo\".","FTC final order (Feb 2025) banning deceptive AI lawyer claims, with monetary relief.":"Decisão final da FTC (fev/2025) proibindo alegações enganosas de \"advogado de IA\", com reparação financeira.",
+ "Avoid":"Evitar","Never market as a lawyer. Claims must be backed by evals.":"Nunca se apresentar como advogado. Afirmações precisam ser comprovadas por avaliações.",
+ "Brazil":"Brasil","Agentic AI that automates consumer claims against large companies. Unicorn, valued at US$1.2bn (May 2026).":"IA agêntica que automatiza ações de consumidores contra grandes empresas. Unicórnio avaliado em US$ 1,2 bi (maio/2026).",
+ "OAB-SP filed a public civil action in Oct 2026 to limit its AI to lawyers.":"A OAB-SP entrou com uma ação civil pública em out/2026 para limitar a IA da empresa a advogados.",
+ "High risk":"Alto risco","Even well funded players are being challenged.":"Mesmo empresas bem financiadas estão sendo contestadas.",
+ "Airline claim startups":"Startups de indenização aérea","Platforms that promise compensation for flight problems.":"Plataformas que prometem indenização por problemas em voos.",
+ "OAB/RJ filed seven lawsuits calling the service illegal. In 2024 a federal court rejected an OAB request against a legaltech.":"A OAB/RJ entrou com sete ações dizendo que o serviço é ilegal. Em 2024, a Justiça Federal rejeitou um pedido da OAB contra uma legaltech.",
+ "Grey zone":"Zona cinzenta","Outcomes are mixed; budget for legal fights.":"Os resultados variam; é preciso reservar verba para disputas judiciais.",
+ "Guides people through their case, generates documents, connects them to registered lawyers.":"Orienta as pessoas no caso, gera documentos e as conecta a advogados cadastrados.","Operating at scale as a guide plus lawyer marketplace.":"Opera em escala como guia mais marketplace de advogados.",
+ "Closest safe model":"Modelo seguro mais próximo","Guide and connect, let lawyers advise.":"Orientar e conectar, deixando a orientação jurídica com advogados.",
+ "Could work":"Pode funcionar","Lawyer in the loop:":"Advogado no fluxo:",
+ "Peticiona's intake, triage, drafting and quality gate, with a partner labour lawyer who advises and signs. Mirrors how Grapple sits inside Monaco Solicitors in the UK.":"O cadastro, a triagem, a redação e o filtro de qualidade da Peticiona, com um advogado trabalhista parceiro que orienta e assina. Espelha como a Grapple funciona dentro da Monaco Solicitors no Reino Unido.",
+ "B2B tool for labour law firms:":"Ferramenta B2B para escritórios trabalhistas:","with 3.6 million new cases a year, productivity for lawyers is a big market and avoids the OAB conflict.":"com 3,6 milhões de ações novas por ano, produtividade para advogados é um mercado grande e evita o conflito com a OAB.",
+ "Free information and calculators":"Informação e calculadoras gratuitas","(rights, deadlines, claim value) as top of funnel, handing off to lawyers.":"(direitos, prazos, valor da causa) como topo de funil, encaminhando para advogados.",
+ "Could NOT work":"NÃO deve funcionar","Copying the UK \"no lawyers\" model:":"Copiar o modelo \"sem advogados\" do Reino Unido:","legal advice is reserved for lawyers, and the OAB is actively suing.":"orientação jurídica é privativa de advogado, e a OAB está processando ativamente.",
+ "\"AI lawyer\" marketing:":"Marketing de \"advogado de IA\":","fails with the OAB and, as DoNotPay showed, with consumer regulators.":"não passa pela OAB nem, como a DoNotPay mostrou, pelos órgãos de defesa do consumidor.",
+ "A pure price pitch:":"Competir só no preço:","many labour lawyers already charge nothing upfront and take a share of the result.":"muitos advogados trabalhistas já não cobram nada adiantado e ficam com uma parte do resultado.","(Assumption to validate.)":"(Hipótese a validar.)",
+ "Unproven: test before scaling":"Não comprovado: testar antes de escalar",
+ "Do letters settle?":"As cartas geram acordo?","Many employers may wait for the court conciliation hearing instead. Measure reply and settlement rate per letter in a small pilot.":"Muitas empresas podem preferir esperar a audiência de conciliação. Medir a taxa de resposta e de acordo por carta num piloto pequeno.",
+ "Cost of losing for workers:":"Custo de perder para o trabalhador:",
+ "a losing worker can be ordered to pay the other side's legal fees (5% to 15%, CLT art. 791-A). For workers on free legal aid, the STF suspended this for 2 years (ADI 5766), so the risk is lower but real. The quality gate protects users, not only the brand.":"o trabalhador que perde pode ser condenado a pagar os honorários da outra parte (5% a 15%, CLT art. 791-A). Para quem tem justiça gratuita, o STF suspendeu essa cobrança por 2 anos (ADI 5766), então o risco é menor, mas existe. O filtro de qualidade protege os usuários, não só a marca.",
+ "Success fee structure:":"Estrutura de cobrança por êxito:","fee arrangements between a tech company and lawyers have specific ethics rules. Needs legal review.":"a remuneração entre uma empresa de tecnologia e advogados tem regras éticas específicas. Precisa de revisão jurídica.",
+ "Verdict":"Veredito","The tech travels, the business model does not.":"A tecnologia viaja, o modelo de negócio não.",
+ "Enter Brazil as the tool that makes labour lawyers faster and safer, not as their replacement: partner with a Brazilian labour law firm, start with the four end of employment playbooks in one state, and prove letter to settlement conversion before scaling.":"Entrar no Brasil como a ferramenta que deixa os advogados trabalhistas mais rápidos e seguros, não como substituta deles: firmar parceria com um escritório trabalhista, começar com os quatro playbooks de fim de contrato em um estado e comprovar a conversão de carta em acordo antes de escalar.",
+ "Sources":"Fontes",
+ "How it is built":"Como foi construído","Every part runs in this page. The architecture maps one to one to what I would build in production.":"Cada parte roda nesta página. A arquitetura corresponde exatamente ao que eu construiria em produção.",
+ "PII redaction (code)":"Anonimização de dados pessoais (código)","Triage · Haiku: playbook + facts":"Triagem · Haiku: playbook + fatos","Pre checks (code): scope, time limit, required facts":"Pré-checagens (código): escopo, prazo, fatos obrigatórios","Retriever: mandatory + BM25":"Busca: obrigatórias + BM25",
+ "Guardrails + citation verifier (code)":"Guardrails + verificador de citações (código)","Judge · Opus, blind":"Juiz · Opus, às cegas","Score + gate":"Nota + filtro","Value calculator (code)":"Calculadora de valor (código)","Send / lawyer review / refuse":"Enviar / revisão de advogado / recusar","Event log → funnel":"Log de eventos → funil",
+ "Design decisions":"Decisões de design","RAG holds the law, playbooks hold the letters.":"O RAG guarda a lei; os playbooks guardam as cartas.",
+ "Retrieval finds which rules apply. The letter structure comes from one playbook per case type, written and approved by a lawyer. Models fill playbooks; they do not invent them.":"A busca encontra quais regras se aplicam. A estrutura da carta vem de um playbook por tipo de caso, escrito e aprovado por um advogado. Os modelos preenchem os playbooks; não os inventam.",
+ "One niche first.":"Um nicho primeiro.","Four end of employment playbooks, everything else turned away. Easier to test, to get right, and to explain to a regulator.":"Quatro playbooks de fim de contrato, e todo o resto recusado. Mais fácil de testar, de acertar e de explicar a um regulador.",
+ "Stop early, stop cheap.":"Parar cedo, parar barato.","Out of scope, time barred or missing facts are caught after one small model call, before the expensive ones.":"Casos fora do escopo, prescritos ou com fatos faltando são barrados depois de uma chamada a um modelo pequeno, antes das caras.",
+ "Code before AI for facts.":"Para fatos, código antes de IA.","Whether a quote exists in a source is checked by string matching, not by a model. Models only judge things that need judgement.":"Se uma citação existe na fonte é checado por comparação de texto, não por um modelo. Os modelos só julgam o que exige julgamento.",
+ "Two models, one judge.":"Dois modelos, um juiz.","Lets us pick the cheapest model that passes the gate, and spot regressions when prompts or models change.":"Permite escolher o modelo mais barato que passa no filtro e detectar regressões quando prompts ou modelos mudam.",
+ "Blind, shuffled judging":"Avaliação às cegas e com ordem sorteada","to reduce self preference and position bias.":"para reduzir o viés de autopreferência e de posição.",
+ "Refusal is a feature.":"Recusar é uma funcionalidade.","Peticiona's promise is that it will not send a weak letter. The gate makes that measurable.":"A promessa da Peticiona é não enviar uma carta fraca. O filtro torna isso mensurável.",
+ "Style guard.":"Controle de estilo.","Drafts are told to avoid typical AI tells (like em dashes) that opposing lawyers already flag.":"Os rascunhos são instruídos a evitar marcas típicas de IA (como travessões) que advogados da outra parte já apontam.",
+ "How we would know the letters are right":"Como saberíamos que as cartas estão certas",
+ "A Brazilian labour lawyer writes each playbook and 20 gold standard letters per playbook.":"Um advogado trabalhista brasileiro escreve cada playbook e 20 cartas modelo por playbook.",
+ "Every lawyer edit during review is saved and turned into new test cases.":"Cada edição feita pelo advogado na revisão é salva e vira um novo caso de teste.",
+ "The judge is calibrated against lawyer scores; once agreement is high enough, it reviews alone and lawyers sample.":"O juiz é calibrado com as notas dos advogados; quando a concordância for alta o bastante, ele revisa sozinho e os advogados fazem amostragem.",
+ "Weekly regression run: every prompt or model change is tested on the full set before release.":"Teste de regressão semanal: toda mudança de prompt ou de modelo é testada no conjunto completo antes de ir ao ar.",
+ "Demo only. Not legal advice. Sample cases are fictional. The legal texts were taken from public secondary sources and have not been reviewed by a lawyer.":"Apenas demonstração. Não é orientação jurídica. Os casos de exemplo são fictícios. Os textos legais vieram de fontes secundárias públicas e não foram revisados por um advogado.",
+ /* dynamic */
+ "Pre check":"Pré-checagem","Result":"Resultado","Detail":"Detalhe","Personal data redacted before any model call":"Dados pessoais anonimizados antes de qualquer chamada a modelo",
+ "pass":"ok","fail":"falhou","stop":"parar","In scope":"No escopo","Within the 2 year limit":"Dentro do prazo de 2 anos","Playbook's required facts present":"Fatos obrigatórios do playbook presentes",
+ "What the models see":"O que os modelos veem","Nothing to redact":"Nada a anonimizar","Not stated or still employed":"Não informado ou ainda empregado","Not an end of employment case":"Não é um caso de fim de contrato",
+ "mandatory for this playbook":"obrigatória para este playbook","Model A":"Modelo A","Model B":"Modelo B","Missing evidence:":"Provas faltando:",
+ "Thinking…":"Pensando…","Reading the story…":"Lendo o relato…","Judge is reading both drafts…":"O juiz está lendo os dois rascunhos…",
+ "no hard fails":"sem falhas graves","hard fail":"falha grave","(hard)":"(grave)",
+ "Required sources cited":"Fontes obrigatórias citadas","Only retrieved sources used":"Só fontes encontradas na busca","All citations come from step 3":"Todas as citações vêm da etapa 3",
+ "No lawyer impersonation":"Não se passa por advogado","The worker signs, not a lawyer":"Quem assina é o trabalhador, não um advogado","No invented amounts":"Sem valores inventados",
+ "No threats":"Sem ameaças","Press, social media, police":"Imprensa, redes sociais, polícia","No guaranteed outcomes":"Sem promessa de resultado","Never promise a result":"Nunca prometer resultado",
+ "Personal data stays redacted":"Dados pessoais continuam anonimizados","No raw CPF in the draft":"Nenhum CPF real no rascunho","Deadline stated":"Prazo informado","No em or en dashes":"Sem travessões",
+ "Common AI tell flagged by opposing lawyers":"Marca comum de IA apontada por advogados da outra parte","Length 120 to 320 words":"Tamanho de 120 a 320 palavras",
+ "Guardrail":"Guardrail","Claim":"Afirmação","Quote check":"Checagem da citação","No legal claims made.":"Nenhuma afirmação jurídica feita.",
+ "verified":"verificada","near":"aproximada","outside":"fora da busca","misquoted":"citação errada","hallucinated":"inventada",
+ "Exact quote found":"Citação exata encontrada","Quote exists, source not retrieved":"A citação existe, mas a fonte não veio da busca","Source ID does not exist":"O ID da fonte não existe",
+ "Support":"Sustentação","Strength":"Força","Note":"Observação","overreach":"exagero","best":"melhor",
+ "Citation accuracy":"Precisão das citações","Citation strength":"Força das citações","Letter quality":"Qualidade da carta","Overall":"Geral",
+ "Ready to send":"Pronta para enviar","Lawyer review":"Revisão de advogado","Refused":"Recusada",
+ "A citation was invented.":"Uma citação foi inventada.","A hard guardrail failed, so a human must check it.":"Um guardrail grave falhou, então uma pessoa precisa revisar.",
+ "Citations verified, guardrails passed, judge approves.":"Citações verificadas, guardrails aprovados, juiz aprova.","Good but not clean enough to send alone.":"Boa, mas não limpa o bastante para enviar sozinha.","Score too low or judge refused.":"Nota baixa demais ou o juiz recusou.",
+ "Monthly salary (R$)":"Salário mensal (R$)","Item":"Item","Formula":"Fórmula","Amount":"Valor",
+ "Unpaid overtime":"Horas extras não pagas","Late severance penalty":"Multa por atraso na rescisão","Pregnancy stability indemnity":"Indenização da estabilidade da gestante","Missing FGTS deposits":"Depósitos de FGTS faltando",
+ "1 monthly salary (payment over 10 days late)":"1 salário mensal (pagamento com mais de 10 dias de atraso)",
+ "Estimated range shown to the user. Low end assumes 30% lost in settlement or proof.":"Faixa estimada mostrada ao usuário. O piso considera 30% perdidos em acordo ou na prova.",
+ "⚠ The unpaid severance itself depends on items the user has not listed yet (notice, vacation, 13th).":"⚠ As verbas rescisórias em si dependem de itens que o usuário ainda não informou (aviso prévio, férias, 13º).",
+ "⚠ If indirect dismissal is recognised, severance and the 40% FGTS fine add to this, but they need the full FGTS balance.":"⚠ Se a rescisão indireta for reconhecida, as verbas rescisórias e a multa de 40% do FGTS somam a isso, mas dependem do saldo total do FGTS.",
+ "⚠ Salary not given. Ask the user before showing any amount.":"⚠ Salário não informado. Perguntar ao usuário antes de mostrar qualquer valor.","⚠ No calculable item from the facts given.":"⚠ Nenhum item calculável com os fatos informados.",
+ "Simplified: no interest, correction or reflex items. A range, never a promise.":"Simplificado: sem juros, correção ou reflexos. Uma faixa, nunca uma promessa.",
+ "Call":"Chamada","Time":"Tempo","Tokens in / out (est.)":"Tokens entrada / saída (est.)","Cost (est.)":"Custo (est.)","Triage · Haiku":"Triagem · Haiku","Judge · Opus":"Juiz · Opus","Model A · Haiku":"Modelo A · Haiku","Model B · Sonnet":"Modelo B · Sonnet","Total":"Total",
+ "Prices are assumed list prices; tokens estimated at 4 characters each.":"Os preços são de tabela estimados; tokens calculados como 4 caracteres cada.",
+ "Your notice is ready to send":"Sua notificação está pronta para enviar","Employer deadline to answer":"Prazo para a empresa responder","Final letter":"Carta final",
+ "Send notice to employer":"Enviar notificação à empresa","Ask a lawyer to check first":"Pedir que um advogado revise antes","Copy letter":"Copiar carta","Copied":"Copiada","Copy not allowed here":"Não foi possível copiar aqui",
+ "Almost there: a lawyer will check it":"Quase lá: um advogado vai revisar","Send to partner lawyer for approval":"Enviar ao advogado parceiro para aprovação","Add more evidence":"Adicionar mais provas",
+ "We won't send this yet":"Ainda não vamos enviar","What would make the case stronger:":"O que fortaleceria o caso:","more detail about what happened":"mais detalhes sobre o que aconteceu","Add the missing information":"Adicionar as informações que faltam",
+ "to be calculated":"a calcular","Estimated claim value":"Valor estimado da causa",
+ "Case":"Caso","Playbook":"Playbook","Outcome":"Resultado","User action":"Ação do usuário","No playbook":"Sem playbook",
+ "Full runs":"Execuções completas","Exact quote rate":"Taxa de citações exatas","Avg citation accuracy":"Precisão média das citações","Avg citation strength":"Força média das citações","Avg overall":"Nota geral média",
+ "Passed gate (send)":"Passou no filtro (enviar)","Hard guardrail failures":"Falhas graves de guardrail","Judge preferred":"Preferido pelo juiz","Avg draft time":"Tempo médio do rascunho","Avg draft cost (est.)":"Custo médio do rascunho (est.)",
+ "Decision rule I would use: ship the cheaper model wherever it passes the gate at the same rate, and keep the larger one for cases routed to review.":"Regra de decisão que eu usaria: usar o modelo mais barato onde ele passa no filtro na mesma taxa, e manter o maior para os casos enviados à revisão.",
+ "The lawyer sees the draft, every citation check, the judge's notes and the facts, so review takes minutes, not hours.":"O advogado vê o rascunho, cada checagem de citação, as notas do juiz e os fatos, então a revisão leva minutos, não horas.",
+ "Today":"Hoje","Review requested.":"Revisão solicitada.","Within 48h (target)":"Em até 48h (meta)","Lawyer approves, edits or rejects. Every edit is saved as training data for the playbook.":"O advogado aprova, edita ou rejeita. Cada edição é salva como dado de treino para o playbook.",
+ "After approval":"Depois da aprovação","Notice is sent. Same follow up as above.":"A notificação é enviada. Mesmo acompanhamento de cima.",
+ "What happens next":"O que acontece agora","Notice sent. Delivery and open tracked.":"Notificação enviada. Entrega e abertura rastreadas.","Deadline for the employer to answer. Reminder sent to the user.":"Prazo para a empresa responder. Lembrete enviado ao usuário.",
+ "If they reply":"Se a empresa responder","Negotiation agent drafts a counter proposal within limits the user approves. Nothing is accepted automatically.":"O agente de negociação redige uma contraproposta dentro dos limites que o usuário aprovar. Nada é aceito automaticamente.",
+ "If no reply":"Se não houver resposta","We help the user file at the Vara do Trabalho in their own name (CLT art. 791) or hand over to a partner lawyer.":"Ajudamos o usuário a entrar com a ação na Vara do Trabalho em nome próprio (CLT art. 791) ou encaminhamos a um advogado parceiro.",
+ "Too late to claim":"Tarde demais para reclamar","The job ended more than 2 years ago, so claims are likely time barred (CF art. 7º, XXIX). We stopped before drafting, so this cost one cheap model call, not four.":"O contrato terminou há mais de 2 anos, então os direitos provavelmente prescreveram (CF art. 7º, XXIX). Paramos antes da redação, então isso custou uma chamada barata a modelo, não quatro.",
+ "Talk to a lawyer about exceptions":"Falar com um advogado sobre exceções","Show where to get help":"Mostrar onde buscar ajuda",
+ "Suggested next step for the user: their union, the Defensoria Pública, or a labour lawyer. We log the case type so the product team can see which demands we turn away most often.":"Próximo passo sugerido ao usuário: o sindicato, a Defensoria Pública ou um advogado trabalhista. Registramos o tipo de caso para o time de produto ver quais demandas mais recusamos.",
+ "We can't take this case":"Não podemos aceitar este caso","This pilot only covers end of employment disputes. We tell the user that clearly, instead of guessing.":"Este piloto só cobre conflitos de fim de contrato. Dizemos isso ao usuário com clareza, em vez de chutar.",
+ "We need a bit more before drafting":"Precisamos de um pouco mais antes de redigir","The playbook needs:":"O playbook precisa de:","Add the missing details":"Adicionar os detalhes que faltam",
+ "sent":"enviado","lawyer":"advogado","referred":"encaminhado","barred":"prescrito","scope":"fora do escopo","missing":"faltando","none":"nenhum","full":"completo",
+ "Permission not granted.":"Permissão não concedida.","Rate limited. Wait a minute and try again.":"Limite de uso atingido. Espere um minuto e tente de novo."
+};
+const FACT_PT = {"monthly salary brl":"salário mensal","months worked":"meses trabalhados","extra hours per week":"horas extras por semana","months since termination":"meses desde o fim do contrato","days since termination":"dias desde o fim do contrato","still employed":"ainda empregado","pregnant weeks at dismissal":"semanas de gravidez na demissão","severance paid":"verbas pagas","fgts months unpaid":"meses de FGTS sem depósito"};
+const VAL_PT = {"missing":"faltando","true":"sim","false":"não","strong":"forte","medium":"médio","weak":"fraco","send":"enviar","review":"revisar","refuse":"recusar"};
+const tPT = s => PT[s] ?? s;
+const PATTERNS = [
+ [/^(\d+) item\(s\) replaced, e\.g\. CPF → \[CPF\]$/, m=>`${m[1]} item(ns) substituído(s), ex.: CPF → [CPF]`],
+ [/^Letter (\d) · (.+?)(?: \(confidence (\d+)%\))?$/, m=>`Carta ${m[1]} · ${tPT(m[2])}${m[3]?` (confiança ${m[3]}%)`:""}`],
+ [/^Letter (\d)$/, m=>`Carta ${m[1]}`],
+ [/^(\d+) months since the job ended$/, m=>`${m[1]} meses desde o fim do contrato`],
+ [/^(BR-\d+) · (.+)$/, m=>`${m[1]} · ${translate(m[2])}`],
+ [/^Read the letter \((\d+) words\)$/, m=>`Ler a carta (${m[1]} palavras)`],
+ [/^case: (\w+)$/, m=>`caso: ${VAL_PT[m[1]]??m[1]}`],
+ [/^verdict: (\w+)$/, m=>`veredito: ${VAL_PT[m[1]]??m[1]}`],
+ [/^Judge prefers Model ([AB]) \((\w+)\)\.$/, m=>`O juiz prefere o Modelo ${m[1]} (${m[2]}).`],
+ [/^\(Draft (\d) for the judge\)$/, m=>`(Rascunho ${m[1]} para o juiz)`],
+ [/^Clarity (\S+) · Tone (\S+) · Actionability (\S+)$/, m=>`Clareza ${m[1]} · Tom ${m[2]} · Acionabilidade ${m[3]}`],
+ [/^(\d+) words$/, m=>`${m[1]} palavras`],
+ [/^Amounts found: (.+)$/, m=>`Valores encontrados: ${m[1]==="none"?"nenhum":m[1]}`],
+ [/^Playbook asks for (.+)$/, m=>`O playbook pede ${m[1]}`],
+ [/^Missing (.+)$/, m=>`Faltando ${m[1]}`],
+ [/^Outside retrieval: (.+)$/, m=>`Fora da busca: ${m[1]}`],
+ [/^Not from the user: (.+)$/, m=>`Não informados pelo usuário: ${m[1]}`],
+ [/^Paraphrased, (\d+)% overlap$/, m=>`Parafraseada, ${m[1]}% de sobreposição`],
+ [/^Quote not in source \((\d+)% overlap\)$/, m=>`A citação não está na fonte (${m[1]}% de sobreposição)`],
+ [/^Quality score \((\w+)\)$/, m=>`Nota de qualidade (${m[1]})`],
+ [/^Day (\d+)$/, m=>`Dia ${m[1]}`],
+ [/^✓ Sent \(simulated\) to (.+) · (BR-\d+)$/, m=>`✓ Enviada (simulação) para ${m[1]} · ${m[2]}`],
+ [/^✓ Sent to partner lawyer queue · (BR-\d+)$/, m=>`✓ Enviada para a fila do advogado parceiro · ${m[1]}`],
+ [/^Your live session funnel: (\d+) stories → (\d+) in scope → (\d+) drafted → (\d+) sent by the user\.$/, m=>`Seu funil nesta sessão: ${m[1]} relatos → ${m[2]} no escopo → ${m[3]} redigidos → ${m[4]} enviados pelo usuário.`],
+ [/^R\$ (\S+) to R\$ (\S+)$/, m=>`R$ ${m[1]} a R$ ${m[2]}`],
+ [/^(.+?) The user gets a clear list of what is missing instead of a dead end\.$/, m=>`${tPT(m[1])} O usuário recebe uma lista clara do que falta, em vez de um beco sem saída.`],
+ [/^\((.+) ÷ 220\) × 1\.5 × (\S+)h\/week × 4\.5 weeks × (\d+) months$/, m=>`(${m[1]} ÷ 220) × 1,5 × ${m[2]}h/semana × 4,5 semanas × ${m[3]} meses`],
+ [/^(.+) × (\S+) months \(rest of pregnancy \+ 5 months after birth\)$/, m=>`${m[1]} × ${m[2]} meses (resto da gravidez + 5 meses após o parto)`],
+ [/^8% × (.+) × (\d+) months$/, m=>`8% × ${m[1]} × ${m[2]} meses`],
+ [/^[a-z ]+: [^·]+( · [a-z ]+: [^·]+)*$/, m=>m[0].split(" · ").map(p=>{const i=p.indexOf(": ");const k=p.slice(0,i),v=p.slice(i+2);return `${FACT_PT[k]??k}: ${VAL_PT[v]??v}`;}).join(" · ")],
+ [/^[a-z ]+(, [a-z ]+)*$/, m=>FACT_PT[m[0].split(", ")[0]]?m[0].split(", ").map(k=>FACT_PT[k]??k).join(", "):null],
+];
+function translate(s){
+  if(PT[s]!==undefined) return PT[s];
+  for(const [re,fn] of PATTERNS){ const m=s.match(re); if(m){ const r=fn(m); if(r!=null) return r; } }
+  return null;
+}
+let LANG = "pt";
+try{ const v=localStorage.getItem("peticiona_lang"); if(v==="en"||v==="pt") LANG=v; }catch(e){}
+const ORIG = new WeakMap(), SET = new WeakMap();
+const SKIP = new Set(["SCRIPT","STYLE","CODE","TEXTAREA"]);
+function trNode(n){
+  if(n.nodeType===3){
+    let orig = ORIG.get(n);
+    if(orig===undefined || SET.get(n)!==n.nodeValue){ orig=n.nodeValue; ORIG.set(n,orig); }
+    let out = orig;
+    if(LANG==="pt"){ const t=orig.replace(/\s+/g," ").trim(); if(t){ const r=translate(t); if(r!=null) out=orig.replace(orig.trim(), r); } }
+    if(n.nodeValue!==out) n.nodeValue=out;
+    SET.set(n,out);
+  } else if(n.nodeType===1 && !SKIP.has(n.tagName) && !(n.classList&&(n.classList.contains("letter")||n.classList.contains("stream")))){
+    n.childNodes.forEach(trNode);
+  }
+}
+function applyLang(){
+  document.documentElement.lang = LANG==="pt"?"pt-BR":"en";
+  document.title = LANG==="pt"?"Peticiona · Demo do fluxo de IA":"Peticiona · AI case workflow demo";
+  trNode(document.body);
+}
+const langLine = () => LANG==="pt"
+  ? "\nLANGUAGE: write every free-text explanation field (summary_en, reason_en, rationale_en, note_en, why_en) in Brazilian Portuguese."
+  : "";
+new MutationObserver(ms=>{ for(const m of ms) m.addedNodes.forEach(trNode); }).observe(document.body,{childList:true,subtree:true});
+window.addEventListener("message", e=>{ const d=e.data; if(d&&d.type==="peticiona-lang"&&(d.lang==="pt"||d.lang==="en")&&d.lang!==LANG){ LANG=d.lang; applyLang(); } });
+window.addEventListener("storage", e=>{ if(e.key==="peticiona_lang"&&(e.newValue==="pt"||e.newValue==="en")&&e.newValue!==LANG){ LANG=e.newValue; applyLang(); } });
+
 /* ---------------- CORPUS (real provisions, verified text) ---------------- */
 const CORPUS = [
  {id:"CLT-59", ref:"CLT, art. 59, caput e § 1º", topic:"Horas extras",
@@ -593,7 +852,7 @@ STORY
 ${story}
 
 Reply with ONLY valid JSON:
-{"playbook":"severance|indirect|pregnancy|overtime|out_of_scope","confidence":0.0,"reason_en":"one sentence","facts":{"monthly_salary_brl":null,"months_worked":null,"extra_hours_per_week":null,"months_since_termination":null,"days_since_termination":null,"still_employed":null,"pregnant_weeks_at_dismissal":null,"severance_paid":null,"fgts_months_unpaid":null}}`;
+{"playbook":"severance|indirect|pregnancy|overtime|out_of_scope","confidence":0.0,"reason_en":"one sentence","facts":{"monthly_salary_brl":null,"months_worked":null,"extra_hours_per_week":null,"months_since_termination":null,"days_since_termination":null,"still_employed":null,"pregnant_weeks_at_dismissal":null,"severance_paid":null,"fgts_months_unpaid":null}}`+langLine();
 }
 function draftPrompt(story, pb, srcs, facts){
   return `You draft an extrajudicial notice ("notificação extrajudicial") that a Brazilian worker sends to the employer IN THEIR OWN NAME.
@@ -624,7 +883,7 @@ WORKER'S STORY (personal data redacted)
 ${story}
 
 Reply with ONLY valid JSON, no markdown:
-{"summary_en":"one sentence in English for a UK reviewer","case_strength":"strong|medium|weak","missing_evidence":["..."],"claims":[{"claim_pt":"...","source_id":"...","quote":"..."}],"demand_pt":"what the worker asks for and the deadline","letter_pt":"the full notice, 150 to 280 words"}`;
+{"summary_en":"one sentence in English for a UK reviewer","case_strength":"strong|medium|weak","missing_evidence":["..."],"claims":[{"claim_pt":"...","source_id":"...","quote":"..."}],"demand_pt":"what the worker asks for and the deadline","letter_pt":"the full notice, 150 to 280 words"}`+langLine();
 }
 function judgePrompt(story, pb, srcs, drafts){
   return `You are a strict senior Brazilian labour lawyer reviewing AI-drafted notices before they are sent. You do not know who wrote them.
@@ -647,7 +906,7 @@ For each claim: support 0-5 (does the source support the claim as stated?) and s
 For each draft: clarity 0-5, tone 0-5 (firm, not aggressive), actionability 0-5 (clear demand and deadline), overreach true/false, verdict "send" | "review" | "refuse".
 
 Reply with ONLY valid JSON, no markdown:
-{"drafts":[{"draft":1,"claims":[{"i":0,"support":0,"strength":0,"note_en":"short"}],"clarity":0,"tone":0,"actionability":0,"overreach":false,"verdict":"send","rationale_en":"two sentences"}],"preferred":1,"why_en":"one sentence"}`;
+{"drafts":[{"draft":1,"claims":[{"i":0,"support":0,"strength":0,"note_en":"short"}],"clarity":0,"tone":0,"actionability":0,"overreach":false,"verdict":"send","rationale_en":"two sentences"}],"preferred":1,"why_en":"one sentence"}`+langLine();
 }
 
 /* ---------------- code guardrails ---------------- */
@@ -960,6 +1219,7 @@ async function run(){
 }
 $("#runBtn").onclick = run;
 
+applyLang();
 </script>
 </body>
 </html>
