@@ -197,6 +197,7 @@ code{font-family:var(--mono);font-size:12.5px;background:#f1efe8;padding:1px 5px
     <h3>Runs this session <span class="pill">live data</span></h3>
     <p class="note">Every run is logged here, so the model comparison in tab 2 is built from real results.</p>
     <div id="logOut"><p class="note">No runs yet.</p></div>
+    <div class="ctarow hidden" id="logActs"><button class="btn ghost" id="csvLogBtn">Copy as CSV</button><button class="btn ghost" id="clearLogBtn">Clear log</button></div>
   </div>
 </section>
 
@@ -445,6 +446,7 @@ const PT = {
  "Runs this session":"Execuções nesta sessão","live data":"dados reais",
  "Every run is logged here, so the model comparison in tab 2 is built from real results.":"Cada execução fica registrada aqui, então a comparação de modelos na aba 2 é feita com resultados reais.",
  "No runs yet.":"Nenhuma execução ainda.",
+ "Copy as CSV":"Copiar como CSV","Clear log":"Limpar registro","CSV copied":"CSV copiado",
  "The metrics I would run Peticiona on":"As métricas com que eu gerenciaria a Peticiona",
  "On a pay on success model, every case that stalls is lost revenue. So the north star is settlements per case started, not letters sent.":"Num modelo de cobrança por êxito, cada caso que trava é receita perdida. Por isso a métrica norte é acordos por caso iniciado, e não cartas enviadas.",
  "The funnel below uses":"O funil abaixo usa","illustrative numbers":"números ilustrativos",
@@ -1012,7 +1014,7 @@ function modelCard(key, state, data){
 
 /* ---------------- final screen + CTA ---------------- */
 let LAST = null;
-const caseId = () => "BR-" + String(1000 + LOG.length).padStart(4,"0");
+const caseId = () => "BR-" + String(1000 + LOG.reduce((m,r)=>Math.max(m,(+String(r.id).slice(3)||0)-999),LOG.length)).padStart(4,"0");
 function renderDone(){
   if(!LAST) return; const L = LAST; show("#doneCard");
   const pb = L.pbKey ? PLAYBOOKS[L.pbKey] : null;
@@ -1079,8 +1081,34 @@ async function act(a, btn){
 
 /* ---------------- session log ---------------- */
 const LOG = [];
+const LOG_KEY = "peticiona_runs", LOG_MAX = 200;
+// Only summary fields are stored: no letters, claim text or quotes.
+const sumScore = s => s && {acc:s.acc, str:s.str, qual:s.qual, overall:s.overall, gate:s.gate, hardFail:!!s.hardFail, ms:s.ms, cost:s.cost, claims:(s.claims||[]).map(c=>({status:c.status}))};
+const sumRun = r => ({id:r.id, time:r.time, pbKey:r.pbKey||null, kind:r.kind, cta:r.cta||null, winner:r.winner||null,
+  A:sumScore(r.A), B:sumScore(r.B), bestScore:r.bestScore?{gate:r.bestScore.gate}:null});
+function saveLog(){ try{ localStorage.setItem(LOG_KEY, JSON.stringify(LOG.slice(-LOG_MAX).map(sumRun))); }catch(e){} }
+function loadLog(){
+  try{ const v=JSON.parse(localStorage.getItem(LOG_KEY)||"[]");
+    if(Array.isArray(v)) v.filter(r=>r&&r.id&&r.kind&&(r.kind!=="full"||(r.A&&r.B&&r.bestScore&&GATE[r.bestScore.gate]))).slice(-LOG_MAX).forEach(r=>LOG.push(r));
+  }catch(e){}
+}
+function logCsv(){
+  const q = v => { const t = v==null ? "" : String(v); return /[",\n]/.test(t) ? `"${t.replace(/"/g,'""')}"` : t; };
+  const head = ["case","time","playbook","outcome","gate","model_a_overall","model_b_overall","model_a_cost_usd","model_b_cost_usd","judge_preferred","user_action"];
+  return [head.join(","), ...LOG.map(r=>[r.id, r.time, r.pbKey?PLAYBOOKS[r.pbKey]?.n??r.pbKey:"", r.kind, r.bestScore?.gate||"",
+    r.A?.overall??"", r.B?.overall??"", r.A?.cost!=null?r.A.cost.toFixed(4):"", r.B?.cost!=null?r.B.cost.toFixed(4):"", r.winner||"", r.cta||""].map(q).join(","))].join("\n");
+}
+$("#csvLogBtn").onclick = async e => { const btn=e.currentTarget;
+  try{ await navigator.clipboard.writeText(logCsv()); btn.textContent="CSV copied"; }catch(err){ btn.textContent="Copy not allowed here"; }
+  setTimeout(()=>{ btn.textContent="Copy as CSV"; }, 2000); };
+$("#clearLogBtn").onclick = () => {
+  if(!confirm(LANG==="pt"?"Apagar todas as execuções salvas?":"Delete all saved runs?")) return;
+  LOG.length = 0; try{ localStorage.removeItem(LOG_KEY); }catch(e){}
+  renderLog(); $("#cmp").innerHTML = `<p class="note">Run the workflow on tab 1 to fill this table.</p>`;
+};
 function logCta(){ renderLog(); }
 function renderLog(){
+  saveLog(); $("#logActs").classList.toggle("hidden", !LOG.length);
   if(!LOG.length){ $("#logOut").innerHTML=`<p class="note">No runs yet.</p>`; return; }
   $("#logOut").innerHTML = `<table><tr><th>Case</th><th>Playbook</th><th>Outcome</th><th>Haiku</th><th>Sonnet</th><th>User action</th></tr>${
     LOG.slice().reverse().map(r=>`<tr><td>${r.id}<div class="note">${r.time}</div></td><td>${r.pbKey?`Letter ${PLAYBOOKS[r.pbKey].n}`:"none"}</td><td>${r.kind==="full"?`<span class="pill ${GATE[r.bestScore.gate].cls}">${GATE[r.bestScore.gate].t}</span>`:`<span class="pill bad">${r.kind}</span>`}</td><td>${r.A?r.A.overall:"–"}</td><td>${r.B?r.B.overall:"–"}</td><td>${r.cta||"–"}</td></tr>`).join("")}</table>`;
@@ -1219,6 +1247,7 @@ async function run(){
 }
 $("#runBtn").onclick = run;
 
+loadLog(); if(LOG.length){ renderLog(); renderCompare(); }
 applyLang();
 </script>
 </body>
